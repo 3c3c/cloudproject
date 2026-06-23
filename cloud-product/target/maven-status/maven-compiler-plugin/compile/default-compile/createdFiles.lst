@@ -1,0 +1,7 @@
+com\cloud\product\config\SecurityConfig.class
+com\cloud\product\service\ProductService.class
+com\cloud\product\entity\Product.class
+com\cloud\product\ProductApplication.class
+com\cloud\product\controller\ProductController.class
+com\cloud\product\mapper\ProductMapper.class
+com\cloud\product\service\impl\ProductServiceImpl.class

@@ -1,0 +1,62 @@
+server:
+  port: 7001
+
+spring:
+  application:
+    name: cloud-auth
+
+  # 从 Nacos 配置中心拉取共享配置 cloud-common.yaml（连不上不报错，下方本地配置兜底）
+  config:
+    import:
+      - "optional:nacos:cloud-common.yaml"
+
+  cloud:
+    nacos:
+      discovery:
+        server-addr: ${NACOS_ADDR:127.0.0.1:8848}
+        namespace: ${NACOS_NS:public}
+      config:
+        server-addr: ${NACOS_ADDR:127.0.0.1:8848}
+        namespace: ${NACOS_NS:public}
+        file-extension: yaml
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${MYSQL_HOST:127.0.0.1}:${MYSQL_PORT:3306}/cloud_auth?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&createDatabaseIfNotExist=true
+    username: ${MYSQL_USER:root}
+    password: ${MYSQL_PASSWORD:root}
+
+  data:
+    redis:
+      host: ${REDIS_HOST:127.0.0.1}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      database: 0
+
+  # 启动时自动执行建表与初始数据（幂等，可重复执行）
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:schema.sql
+      data-locations: classpath:data.sql
+
+mybatis-plus:
+  mapper-locations: classpath*:mapper/**/*.xml
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      id-type: auto
+
+# JWT 配置（与网关、Nacos 共享配置保持一致）
+jwt:
+  secret: ${JWT_SECRET:cloud-project-default-secret-key-please-change-in-nacos-32bytes}
+  expiration: 7200000
+  header: Authorization
+  token-prefix: "Bearer "
+
+logging:
+  level:
+    com.cloud: debug
+    org.springframework.security: info

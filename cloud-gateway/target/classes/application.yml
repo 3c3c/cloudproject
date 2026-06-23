@@ -1,0 +1,65 @@
+server:
+  port: 9527
+
+spring:
+  application:
+    name: cloud-gateway
+
+  config:
+    import:
+      - "optional:nacos:cloud-common.yaml"
+
+  cloud:
+    nacos:
+      discovery:
+        server-addr: ${NACOS_ADDR:127.0.0.1:8848}
+        namespace: ${NACOS_NS:public}
+      config:
+        server-addr: ${NACOS_ADDR:127.0.0.1:8848}
+        namespace: ${NACOS_NS:public}
+        file-extension: yaml
+
+    gateway:
+      # 关闭按服务名自动生成路由，统一手动配置
+      discovery:
+        locator:
+          enabled: false
+      routes:
+        - id: cloud-auth
+          uri: lb://cloud-auth
+          predicates:
+            - Path=/auth/**
+        - id: cloud-product
+          uri: lb://cloud-product
+          predicates:
+            - Path=/products/**
+        - id: cloud-order
+          uri: lb://cloud-order
+          predicates:
+            - Path=/orders/**
+
+  data:
+    redis:
+      host: ${REDIS_HOST:127.0.0.1}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      database: 0
+
+# JWT（与 auth 服务一致）
+jwt:
+  secret: ${JWT_SECRET:cloud-project-default-secret-key-please-change-in-nacos-32bytes}
+  header: Authorization
+  token-prefix: "Bearer "
+
+# 网关白名单：这些路径不校验 token
+gateway:
+  white-list:
+    - /auth/login
+    - /auth/register
+    - /auth/sms/send
+    - /auth/sms/login
+    - /actuator
+
+logging:
+  level:
+    com.cloud: debug

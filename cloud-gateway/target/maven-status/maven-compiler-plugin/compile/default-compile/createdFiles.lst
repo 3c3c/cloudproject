@@ -1,0 +1,3 @@
+com\cloud\gateway\config\GatewayProperties.class
+com\cloud\gateway\filter\AuthenticationFilter.class
+com\cloud\gateway\GatewayApplication.class
