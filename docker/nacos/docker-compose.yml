@@ -1,0 +1,60 @@
+# =====================================================================
+# 开发环境一键启动：Nacos 配置中心/注册中心 + MySQL + Redis
+# Nacos 版本 v2.3.2，配套 Spring Cloud Alibaba 2023.0.1.0（自带 Nacos Client 2.3.2）
+#
+#   启动： docker compose -f docker/nacos/docker-compose.yml up -d
+#   导配置：bash docker/nacos/init-configs.sh
+#   控制台：http://localhost:8848/nacos  （账号/密码：nacos / nacos）
+#   停止： docker compose -f docker/nacos/docker-compose.yml down
+# =====================================================================
+services:
+  nacos:
+    image: nacos/nacos-server:v2.3.2
+    container_name: nacos-standalone
+    environment:
+      - MODE=standalone          # 单机模式，内嵌 Derby 存储（开发够用；生产请接 MySQL）
+      - PREFER_HOST_MODE=hostname
+      # 鉴权（Nacos 2.2+ 默认开启，三个 token必填，否则启动告警/接口 403）
+      - NACOS_AUTH_ENABLE=true
+      - NACOS_AUTH_TOKEN=VGhpc0lzTXlDdXN0b21TZWNyZXRLZXkwMTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkw
+      - NACOS_AUTH_IDENTITY_KEY=serverIdentity
+      - NACOS_AUTH_IDENTITY_VALUE=security
+      - JVM_XMS=512m
+      - JVM_XMX=512m
+      - JVM_XMN=256m
+      - TIME_ZONE=Asia/Shanghai
+    ports:
+      - "8848:8848"   # HTTP 控制台 / Open API
+      - "9848:9848"   # gRPC 客户端端口 —— Spring Cloud Alibaba 客户端必须能访问，否则连不上！
+      - "9849:9849"   # gRPC 节点间通信（集群用；单机开了无妨）
+    volumes:
+      - nacos-logs:/home/nacos/logs
+    restart: unless-stopped
+
+  mysql:
+    image: mysql:8.0
+    container_name: cloud-mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - TZ=Asia/Shanghai
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: cloud-redis
+    command: redis-server --appendonly yes
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    restart: unless-stopped
+
+volumes:
+  nacos-logs:
+  mysql-data:
+  redis-data:

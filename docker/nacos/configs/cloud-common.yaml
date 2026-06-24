@@ -1,0 +1,36 @@
+# =====================================================================
+# 共享配置 cloud-common.yaml（group: DEFAULT_GROUP, namespace: public）
+# 被所有服务通过 spring.config.import 引入。
+# 内含跨服务复用的中间件与公共参数；本服务私有配置在 <服务名>.yaml 中。
+# =====================================================================
+
+# ===== 公共中间件：Redis（auth、gateway 使用；其余服务无 redis starter 自动忽略）=====
+spring:
+  data:
+    redis:
+      host: ${REDIS_HOST:127.0.0.1}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      database: 0
+
+# ===== JWT：auth 与 gateway 必须使用同一套，否则验签失败 =====
+jwt:
+  secret: ${JWT_SECRET:cloud-project-default-secret-key-please-change-in-nacos-32bytes}
+  expiration: 7200000          # 2 小时（毫秒）
+  header: Authorization
+  token-prefix: "Bearer "
+
+# ===== MyBatis-Plus 公共（auth / product / order 共用；gateway 无该 starter 自动忽略）=====
+mybatis-plus:
+  mapper-locations: classpath*:mapper/**/*.xml
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      id-type: auto
+
+# ===== 日志 =====
+logging:
+  level:
+    com.cloud: debug

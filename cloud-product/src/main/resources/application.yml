@@ -1,44 +1,19 @@
+# 商品服务本地引导配置：仅连接 Nacos，其余（数据源/MyBatis/日志）全部来自 Nacos
+#   cloud-common.yaml  —— 共享配置（MyBatis-Plus/日志）
+#   cloud-product.yaml —— 本服务私有配置（数据源）
 server:
   port: 8001
 
 spring:
   application:
     name: cloud-product
-
-  config:
-    import:
-      - "optional:nacos:cloud-common.yaml"
-
   cloud:
     nacos:
-      discovery:
-        server-addr: ${NACOS_ADDR:127.0.0.1:8848}
-        namespace: ${NACOS_NS:public}
-      config:
-        server-addr: ${NACOS_ADDR:127.0.0.1:8848}
-        namespace: ${NACOS_NS:public}
-        file-extension: yaml
-
-  datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://${MYSQL_HOST:127.0.0.1}:${MYSQL_PORT:3306}/cloud_product?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&createDatabaseIfNotExist=true
-    username: ${MYSQL_USER:root}
-    password: ${MYSQL_PASSWORD:root}
-
-  sql:
-    init:
-      mode: always
-      schema-locations: classpath:schema.sql
-
-mybatis-plus:
-  mapper-locations: classpath*:mapper/**/*.xml
-  configuration:
-    map-underscore-to-camel-case: true
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
-  global-config:
-    db-config:
-      id-type: auto
-
-logging:
-  level:
-    com.cloud: debug
+      server-addr: ${NACOS_ADDR:127.0.0.1:8848}
+      namespace: ${NACOS_NS:}        # 留空 = public 命名空间
+      username: ${NACOS_USER:nacos}
+      password: ${NACOS_PASSWORD:nacos}
+  config:
+    import:
+      - optional:nacos:cloud-common.yaml
+      - optional:nacos:cloud-product.yaml
