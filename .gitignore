@@ -1,0 +1,72 @@
+# ====================
+# IntelliJ IDEA
+# ====================
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+.idea_modules/
+
+# ====================
+# Eclipse / STS（兼容用 IDEA 的同事）
+# ====================
+.settings/
+.project
+.classpath
+.factorypath
+
+# ====================
+# Java / Maven 编译产物
+# ====================
+*.class
+target/
+bin/
+
+# ====================
+# 打包产物
+# ====================
+*.jar
+*.war
+*.ear
+*.nar
+*.zip
+*.tar.gz
+*.rar
+
+# ====================
+# 日志
+# ====================
+*.log
+logs/
+
+# ====================
+# 本地配置 / 密钥（数据库账号、第三方 secret 等，按需保留）
+# 基线 application.yml 进库，仅排除 *-local 本地覆盖
+# ====================
+application-local.yml
+application-local.yaml
+application-local.properties
+bootstrap-local.yml
+*-local.yml
+*-local.yaml
+
+# ====================
+# JVM 崩溃转储
+# ====================
+hs_err_pid*
+replay_pid*
+
+# ====================
+# 操作系统
+# ====================
+.DS_Store
+Thumbs.db
+desktop.ini
+ehthumbs.db
+
+# ====================
+# 其他编辑器
+# ====================
+.vscode/
+nbproject/private/
