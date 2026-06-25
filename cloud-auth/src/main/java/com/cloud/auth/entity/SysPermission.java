@@ -12,10 +12,10 @@ import lombok.EqualsAndHashCode;
 @TableName("sys_permission")
 public class SysPermission extends BaseEntity {
 
-    @TableId(type = IdType.AUTO)
+    @TableId(type = IdType.ASSIGN_ID)
     private Long id;
 
-    private String permCode;    // 权限码，如 system-email:read 或 product:add
+    private String permCode;    // 权限码 product:add
     private String permName;    // 说明
     private String serviceCode; // 所属产品/服务，如 product / order / system
 }
