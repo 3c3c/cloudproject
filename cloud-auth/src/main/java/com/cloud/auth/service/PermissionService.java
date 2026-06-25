@@ -1,8 +1,8 @@
 package com.cloud.auth.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.cloud.auth.dto.PermissionRequest;
-import com.cloud.auth.dto.PermissionResponse;
+import com.cloud.auth.dto.permission.PermissionRequest;
+import com.cloud.auth.dto.permission.PermissionResponse;
 
 /**
  * 权限管理服务接口

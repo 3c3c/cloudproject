@@ -1,8 +1,7 @@
 package com.cloud.auth.service.impl;
 
-import com.cloud.auth.dto.LoginRequest;
-import com.cloud.auth.dto.LoginResponse;
-import com.cloud.auth.dto.UserInfo;
+import com.cloud.auth.dto.login.LoginRequest;
+import com.cloud.auth.dto.login.LoginResponse;
 import com.cloud.auth.service.AuthService;
 import com.cloud.auth.service.UserService;
 import com.cloud.common.constant.RedisConstants;
@@ -55,8 +54,8 @@ public class AuthServiceImpl implements AuthService {
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList());
         return new LoginResponse(token, jwtUtils.getTokenPrefix(),
-                loginUser.getUserId(), loginUser.getUsername(), authorities,
-                Boolean.TRUE.equals(loginUser.getMustChangePassword()));
+                loginUser.getUserId(), loginUser.getUsername(), loginUser.getAvatar(),
+                authorities, Boolean.TRUE.equals(loginUser.getMustChangePassword()));
     }
 
     @Override
@@ -77,11 +76,5 @@ public class AuthServiceImpl implements AuthService {
     public LoginResponse refresh() {
         LoginUser loginUser = SecurityUtils.getCurrentUser();
         return issueToken(loginUser);
-    }
-
-    @Override
-    public UserInfo currentUser() {
-        LoginUser loginUser = SecurityUtils.getCurrentUser();
-        return userService.buildUserInfo(loginUser);
     }
 }

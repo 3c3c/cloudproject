@@ -1,4 +1,4 @@
-package com.cloud.auth.dto;
+package com.cloud.auth.dto.permission;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

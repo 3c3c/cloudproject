@@ -1,8 +1,8 @@
 package com.cloud.auth.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.cloud.auth.dto.RoleRequest;
-import com.cloud.auth.dto.RoleResponse;
+import com.cloud.auth.dto.role.RoleRequest;
+import com.cloud.auth.dto.role.RoleResponse;
 import com.cloud.auth.service.RoleService;
 import com.cloud.common.result.Result;
 import jakarta.validation.Valid;

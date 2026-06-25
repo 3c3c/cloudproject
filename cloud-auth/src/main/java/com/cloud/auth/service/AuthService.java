@@ -1,8 +1,7 @@
 package com.cloud.auth.service;
 
-import com.cloud.auth.dto.LoginRequest;
-import com.cloud.auth.dto.LoginResponse;
-import com.cloud.auth.dto.UserInfo;
+import com.cloud.auth.dto.login.LoginRequest;
+import com.cloud.auth.dto.login.LoginResponse;
 import com.cloud.common.security.LoginUser;
 
 public interface AuthService {
@@ -18,7 +17,4 @@ public interface AuthService {
 
     /** 刷新 token（基于当前上下文重新签发） */
     LoginResponse refresh();
-
-    /** 当前登录用户信息 */
-    UserInfo currentUser();
 }

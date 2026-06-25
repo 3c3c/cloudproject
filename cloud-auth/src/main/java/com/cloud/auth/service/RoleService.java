@@ -1,8 +1,8 @@
 package com.cloud.auth.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.cloud.auth.dto.RoleRequest;
-import com.cloud.auth.dto.RoleResponse;
+import com.cloud.auth.dto.role.RoleRequest;
+import com.cloud.auth.dto.role.RoleResponse;
 
 /**
  * 角色管理服务接口

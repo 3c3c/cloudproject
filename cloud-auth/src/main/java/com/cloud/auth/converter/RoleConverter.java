@@ -1,7 +1,7 @@
 package com.cloud.auth.converter;
 
-import com.cloud.auth.dto.RoleRequest;
-import com.cloud.auth.dto.RoleResponse;
+import com.cloud.auth.dto.role.RoleRequest;
+import com.cloud.auth.dto.role.RoleResponse;
 import com.cloud.auth.entity.SysRole;
 import org.mapstruct.Mapper;
 import org.mapstruct.NullValuePropertyMappingStrategy;

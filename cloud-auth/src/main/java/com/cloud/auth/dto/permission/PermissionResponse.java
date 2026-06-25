@@ -1,4 +1,4 @@
-package com.cloud.auth.dto;
+package com.cloud.auth.dto.permission;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,18 +7,17 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 /**
- * 角色响应DTO
+ * 权限响应DTO
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class RoleResponse {
+public class PermissionResponse {
 
     private Long id;
-    private String roleCode;
-    private String roleName;
-    private String remark;
-    private Integer enabled;
+    private String permCode;
+    private String permName;
+    private String serviceCode;
     private LocalDateTime createTime;
     private LocalDateTime updateTime;
     private String createdBy;

@@ -1,6 +1,6 @@
 package com.cloud.auth.security;
 
-import com.cloud.auth.dto.LoginResponse;
+import com.cloud.auth.dto.login.LoginResponse;
 import com.cloud.auth.service.AuthService;
 import com.cloud.common.result.Result;
 import com.cloud.common.result.ResultCode;

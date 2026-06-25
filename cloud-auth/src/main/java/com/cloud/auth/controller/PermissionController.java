@@ -1,8 +1,8 @@
 package com.cloud.auth.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.cloud.auth.dto.PermissionRequest;
-import com.cloud.auth.dto.PermissionResponse;
+import com.cloud.auth.dto.permission.PermissionRequest;
+import com.cloud.auth.dto.permission.PermissionResponse;
 import com.cloud.auth.service.PermissionService;
 import com.cloud.common.result.Result;
 import jakarta.validation.Valid;

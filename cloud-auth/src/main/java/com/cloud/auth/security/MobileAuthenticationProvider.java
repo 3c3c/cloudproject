@@ -1,6 +1,6 @@
 package com.cloud.auth.security;
 
-import com.cloud.auth.dto.RegisterRequest;
+import com.cloud.auth.dto.register.RegisterRequest;
 import com.cloud.auth.service.SmsService;
 import com.cloud.auth.service.UserService;
 import com.cloud.common.exception.BusinessException;

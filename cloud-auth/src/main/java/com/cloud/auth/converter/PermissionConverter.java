@@ -1,7 +1,7 @@
 package com.cloud.auth.converter;
 
-import com.cloud.auth.dto.PermissionRequest;
-import com.cloud.auth.dto.PermissionResponse;
+import com.cloud.auth.dto.permission.PermissionRequest;
+import com.cloud.auth.dto.permission.PermissionResponse;
 import com.cloud.auth.entity.SysPermission;
 import org.mapstruct.Mapper;
 import org.mapstruct.NullValuePropertyMappingStrategy;

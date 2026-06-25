@@ -1,4 +1,4 @@
-package com.cloud.auth.dto;
+package com.cloud.auth.dto.login;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -15,6 +15,7 @@ public class LoginResponse {
     private String tokenHead;
     private Long userId;
     private String username;
+    private String avatar;
     private List<String> authorities;
     private Boolean mustChangePassword;
 }

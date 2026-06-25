@@ -1,4 +1,4 @@
-package com.cloud.auth.dto;
+package com.cloud.auth.dto.login;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
