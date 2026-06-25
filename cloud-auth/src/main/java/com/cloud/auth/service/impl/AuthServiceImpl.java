@@ -55,7 +55,8 @@ public class AuthServiceImpl implements AuthService {
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList());
         return new LoginResponse(token, jwtUtils.getTokenPrefix(),
-                loginUser.getUserId(), loginUser.getUsername(), authorities);
+                loginUser.getUserId(), loginUser.getUsername(), authorities,
+                Boolean.TRUE.equals(loginUser.getMustChangePassword()));
     }
 
     @Override

@@ -12,6 +12,7 @@ public class SysPermission {
     @TableId(type = IdType.AUTO)
     private Long id;
 
-    private String permCode;
-    private String permName;
+    private String permCode;    // 权限码，如 system-email:read 或 product:add
+    private String permName;    // 说明
+    private String serviceCode; // 所属产品/服务，如 product / order / system
 }

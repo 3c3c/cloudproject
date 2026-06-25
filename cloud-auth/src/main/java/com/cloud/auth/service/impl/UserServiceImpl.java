@@ -50,9 +50,12 @@ public class UserServiceImpl implements UserService {
         }
         SysUser user = new SysUser();
         user.setUsername(req.getUsername());
+        user.setNickname(req.getNickname());
         user.setPassword(passwordEncoder.encode(req.getPassword()));
         user.setMobile(StringUtils.hasText(req.getMobile()) ? req.getMobile() : null);
+        user.setEmail(req.getEmail());
         user.setEnabled(1);
+        user.setMustChangePassword(false);
         userMapper.insert(user);
         // 注册即赋予默认角色 ROLE_USER
         userMapper.bindRole(user.getId(), DEFAULT_USER_ROLE_ID);
@@ -64,7 +67,10 @@ public class UserServiceImpl implements UserService {
         UserInfo info = new UserInfo();
         info.setUserId(loginUser.getUserId());
         info.setUsername(loginUser.getUsername());
+        info.setNickname(loginUser.getNickname());
         info.setMobile(loginUser.getMobile());
+        info.setEmail(loginUser.getEmail());
+        info.setAvatar(loginUser.getAvatar());
         info.setRoles(loadRoleCodes(loginUser.getUserId()));
         info.setPermissions(loadPermCodes(loginUser.getUserId()));
         return info;
@@ -83,7 +89,12 @@ public class UserServiceImpl implements UserService {
         for (SysPermission perm : userMapper.selectPermissionsByUserId(user.getId())) {
             authorities.add(new SimpleGrantedAuthority(perm.getPermCode()));
         }
-        return new LoginUser(user.getId(), user.getUsername(), user.getPassword(), user.getMobile(), authorities);
+        LoginUser loginUser = new LoginUser(user.getId(), user.getUsername(), user.getPassword(), user.getMobile(), authorities);
+        loginUser.setNickname(user.getNickname());
+        loginUser.setEmail(user.getEmail());
+        loginUser.setAvatar(user.getAvatar());
+        loginUser.setMustChangePassword(Boolean.TRUE.equals(user.getMustChangePassword()));
+        return loginUser;
     }
 
     private List<String> loadRoleCodes(Long userId) {

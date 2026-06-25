@@ -17,8 +17,12 @@ public class LoginUser implements UserDetails {
 
     private Long userId;
     private String username;
+    private String nickname;        // 名称
     private String password;
     private String mobile;
+    private String email;           // 邮箱
+    private String avatar;          // 头像
+    private Boolean mustChangePassword; // 是否下次改密
     private Collection<? extends GrantedAuthority> authorities;
 
     public LoginUser() {
