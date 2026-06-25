@@ -9,8 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-
 /**
  * 角色管理服务实现类
  */
@@ -29,8 +27,6 @@ public class RoleServiceImpl implements RoleService {
         }
         // 设置逻辑删除字段为未删除
         role.setDeleted(0);
-        role.setCreateTime(LocalDateTime.now());
-        role.setUpdateTime(LocalDateTime.now());
         roleMapper.insert(role);
         return role;
     }
@@ -44,7 +40,6 @@ public class RoleServiceImpl implements RoleService {
         }
 
         role.setId(id);
-        role.setUpdateTime(LocalDateTime.now());
         roleMapper.updateById(role);
         return roleMapper.selectById(id);
     }

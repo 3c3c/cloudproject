@@ -48,6 +48,13 @@
             <scope>provided</scope>
         </dependency>
 
+        <!-- MyBatis Plus 仅编译期需要，运行期由具体服务提供 -->
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-spring-boot3-starter</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
         <!-- 配置元数据（@ConfigurationProperties） -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

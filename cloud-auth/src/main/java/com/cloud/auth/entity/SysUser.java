@@ -3,13 +3,14 @@ package com.cloud.auth.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.cloud.common.entity.BaseEntity;
 import lombok.Data;
-
-import java.time.LocalDateTime;
+import lombok.EqualsAndHashCode;
 
 @Data
+@EqualsAndHashCode(callSuper = true)
 @TableName("sys_user")
-public class SysUser {
+public class SysUser extends BaseEntity {
 
     @TableId(type = IdType.AUTO)
     private Long id;
@@ -22,6 +23,4 @@ public class SysUser {
     private String avatar;          // 头像 URL
     private Integer enabled;        // 状态：1 启用 0 禁用
     private Boolean mustChangePassword; // 是否下次登录强制改密
-    private LocalDateTime createTime;
-    private LocalDateTime updateTime;
 }
