@@ -1,7 +1,8 @@
 package com.cloud.auth.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.cloud.auth.entity.SysRole;
+import com.cloud.auth.dto.RoleRequest;
+import com.cloud.auth.dto.RoleResponse;
 
 /**
  * 角色管理服务接口
@@ -11,12 +12,12 @@ public interface RoleService {
     /**
      * 创建角色（创建时默认启用）
      */
-    SysRole create(SysRole role);
+    RoleResponse create(RoleRequest request);
 
     /**
      * 编辑角色
      */
-    SysRole update(Long id, SysRole role);
+    RoleResponse update(Long id, RoleRequest request);
 
     /**
      * 删除角色（逻辑删除）
@@ -24,12 +25,22 @@ public interface RoleService {
     void delete(Long id);
 
     /**
+     * 批量删除角色（逻辑删除）
+     */
+    void batchDelete(java.util.List<Long> ids);
+
+    /**
      * 根据ID查询角色
      */
-    SysRole getById(Long id);
+    RoleResponse getById(Long id);
 
     /**
      * 分页查询角色（支持按角色名称筛选）
      */
-    Page<SysRole> page(Integer current, Integer size, String roleName);
+    Page<RoleResponse> page(Integer current, Integer size, String roleName);
+
+    /**
+     * 更新角色状态
+     */
+    void updateStatus(Long id, Integer enabled);
 }

@@ -2,6 +2,9 @@ package com.cloud.auth.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.cloud.auth.converter.RoleConverter;
+import com.cloud.auth.dto.RoleRequest;
+import com.cloud.auth.dto.RoleResponse;
 import com.cloud.auth.entity.SysRole;
 import com.cloud.auth.mapper.SysRoleMapper;
 import com.cloud.auth.service.RoleService;
@@ -17,10 +20,12 @@ import org.springframework.transaction.annotation.Transactional;
 public class RoleServiceImpl implements RoleService {
 
     private final SysRoleMapper roleMapper;
+    private final RoleConverter roleConverter;
 
     @Override
     @Transactional
-    public SysRole create(SysRole role) {
+    public RoleResponse create(RoleRequest request) {
+        SysRole role = roleConverter.toEntity(request);
         // 创建时默认启用
         if (role.getEnabled() == null) {
             role.setEnabled(1);
@@ -28,20 +33,21 @@ public class RoleServiceImpl implements RoleService {
         // 设置逻辑删除字段为未删除
         role.setDeleted(0);
         roleMapper.insert(role);
-        return role;
+        return roleConverter.toResponse(role);
     }
 
     @Override
     @Transactional
-    public SysRole update(Long id, SysRole role) {
+    public RoleResponse update(Long id, RoleRequest request) {
         SysRole existing = roleMapper.selectById(id);
         if (existing == null) {
             throw new RuntimeException("角色不存在");
         }
 
+        SysRole role = roleConverter.toEntity(request);
         role.setId(id);
         roleMapper.updateById(role);
-        return roleMapper.selectById(id);
+        return roleConverter.toResponse(roleMapper.selectById(id));
     }
 
     @Override
@@ -52,12 +58,23 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    public SysRole getById(Long id) {
-        return roleMapper.selectById(id);
+    @Transactional
+    public void batchDelete(java.util.List<Long> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return;
+        }
+        // 使用MyBatis Plus的批量删除方法（支持逻辑删除）
+        roleMapper.deleteBatchIds(ids);
     }
 
     @Override
-    public Page<SysRole> page(Integer current, Integer size, String roleName) {
+    public RoleResponse getById(Long id) {
+        SysRole role = roleMapper.selectById(id);
+        return roleConverter.toResponse(role);
+    }
+
+    @Override
+    public Page<RoleResponse> page(Integer current, Integer size, String roleName) {
         Page<SysRole> page = new Page<>(current, size);
         LambdaQueryWrapper<SysRole> wrapper = new LambdaQueryWrapper<>();
 
@@ -66,6 +83,19 @@ public class RoleServiceImpl implements RoleService {
         }
 
         roleMapper.selectPage(page, wrapper);
-        return page;
+
+        // 转换为Response DTO分页对象
+        Page<RoleResponse> responsePage = new Page<>(current, size, page.getTotal());
+        responsePage.setRecords(roleConverter.toResponseList(page.getRecords()));
+        return responsePage;
+    }
+
+    @Override
+    @Transactional
+    public void updateStatus(Long id, Integer enabled) {
+        SysRole role = new SysRole();
+        role.setId(id);
+        role.setEnabled(enabled);
+        roleMapper.updateById(role);
     }
 }
