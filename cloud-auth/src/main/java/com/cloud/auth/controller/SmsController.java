@@ -12,8 +12,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * 短信验证码接口。
- * 发送验证码：POST /auth/sms/send
- * 验证码登录：POST /auth/sms/login （由 MobileAuthenticationFilter 处理，参数 mobile、code）
  */
 @RestController
 @RequestMapping("/auth/sms")
