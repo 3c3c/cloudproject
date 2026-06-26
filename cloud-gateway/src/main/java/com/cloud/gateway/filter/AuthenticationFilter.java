@@ -1,6 +1,6 @@
 package com.cloud.gateway.filter;
 
-import com.cloud.gateway.config.GatewayProperties;
+import com.cloud.gateway.config.GatewayWhiteListProperties;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
@@ -48,7 +48,7 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
 
     private final ReactiveStringRedisTemplate redisTemplate;
     private final ObjectMapper objectMapper;
-    private final GatewayProperties gatewayProperties;
+    private final GatewayWhiteListProperties gatewayProperties;
 
     @Value("${jwt.secret}")
     private String secret;

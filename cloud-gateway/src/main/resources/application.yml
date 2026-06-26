@@ -1,12 +1,4 @@
-# 网关本地引导配置：仅连接 Nacos，其余（路由/白名单/Redis/JWT）全部来自 Nacos
-#   cloud-common.yaml  —— 共享配置（Redis/JWT）
-#   cloud-gateway.yaml —— 路由 + 白名单
-server:
-  port: 9527
-
 spring:
-  application:
-    name: cloud-gateway
   cloud:
     nacos:
       server-addr: ${NACOS_ADDR:127.0.0.1:8848}

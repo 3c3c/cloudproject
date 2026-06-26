@@ -13,7 +13,7 @@ import java.util.List;
 @Data
 @Component
 @ConfigurationProperties(prefix = "gateway")
-public class GatewayProperties {
+public class GatewayWhiteListProperties {
 
     /** 不需要校验 token 的路径前缀列表 */
     private List<String> whiteList = new ArrayList<>();
