@@ -36,8 +36,12 @@ $configs = @(
     @{DataId="cloud-auth.yaml"; File="cloud-auth.yaml"},
     @{DataId="cloud-product.yaml"; File="cloud-product.yaml"},
     @{DataId="cloud-order.yaml"; File="cloud-order.yaml"},
+    @{DataId="cloud-admin.yaml"; File="cloud-admin.yaml"},
     @{DataId="cloud-gateway.yaml"; File="cloud-gateway.yaml"}
 )
+
+$skipCount = 0
+$publishCount = 0
 
 foreach ($config in $configs) {
     $FilePath = Join-Path $ConfigsDir $config.File
@@ -47,35 +51,64 @@ foreach ($config in $configs) {
         continue
     }
 
-    Write-Host "==> Publishing $($config.DataId) ..." -ForegroundColor Cyan -NoNewline
-
     try {
         $Content = Get-Content $FilePath -Raw -Encoding UTF8
-        $ConfigUrl = "http://" + $NacosAddr + "/nacos/v1/cs/configs"
 
-        $body = @{
+        # Check if config already exists in Nacos
+        $GetConfigUrl = "http://" + $NacosAddr + "/nacos/v1/cs/configs"
+        $getConfigParams = @{
             dataId = $config.DataId
             group = $Group
             tenant = $Namespace
-            type = "yaml"
             accessToken = $Token
-            content = $Content
         }
 
-        $Response = Invoke-RestMethod -Uri $ConfigUrl -Method POST -Body $body
+        $existingConfig = $null
+        try {
+            $existingConfig = Invoke-RestMethod -Uri $GetConfigUrl -Method GET -Body $getConfigParams
+        }
+        catch {
+            # Config doesn't exist yet, that's okay
+            $existingConfig = $null
+        }
 
-        if ($Response -eq $true) {
-            Write-Host " OK" -ForegroundColor Green
+        # Skip if config exists and content is same
+        if ($existingConfig -and $existingConfig.Trim() -eq $Content.Trim()) {
+            Write-Host "==> $($config.DataId) ... " -ForegroundColor Cyan -NoNewline
+            Write-Host "SKIP (already exists, same content)" -ForegroundColor Gray
+            $skipCount++
         }
         else {
-            Write-Host " FAILED: $Response" -ForegroundColor Red
+            # Publish if config doesn't exist or content changed
+            Write-Host "==> Publishing $($config.DataId) ... " -ForegroundColor Cyan -NoNewline
+
+            $ConfigUrl = "http://" + $NacosAddr + "/nacos/v1/cs/configs"
+            $body = @{
+                dataId = $config.DataId
+                group = $Group
+                tenant = $Namespace
+                type = "yaml"
+                accessToken = $Token
+                content = $Content
+            }
+
+            $Response = Invoke-RestMethod -Uri $ConfigUrl -Method POST -Body $body
+
+            if ($Response -eq $true) {
+                Write-Host " OK" -ForegroundColor Green
+                $publishCount++
+            }
+            else {
+                Write-Host " FAILED: $Response" -ForegroundColor Red
+            }
         }
     }
     catch {
+        Write-Host "==> $($config.DataId) ... " -ForegroundColor Cyan -NoNewline
         Write-Host " FAILED: $($_.Exception.Message)" -ForegroundColor Red
     }
 }
 
 Write-Host ""
 Write-Host "DONE! Open http://${NacosAddr}/nacos ($NacosUser/$NacosPassword)" -ForegroundColor Green
-Write-Host "   Check Config Management -> Config List to see the 5 configurations (namespace: public)." -ForegroundColor Green
+Write-Host "   Published: $publishCount, Skipped: $skipCount (total 6 configurations)" -ForegroundColor Green

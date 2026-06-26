@@ -9,3 +9,4 @@ spring:
     import:
       - optional:nacos:cloud-common.yaml
       - optional:nacos:cloud-order.yaml
+
