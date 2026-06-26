@@ -14,8 +14,10 @@ CREATE TABLE IF NOT EXISTS sys_user (
     avatar               VARCHAR(255)    DEFAULT NULL COMMENT '头像URL',
     enabled              TINYINT(1)      NOT NULL DEFAULT 1 COMMENT '状态 1启用 0禁用',
     must_change_password TINYINT(1)      NOT NULL DEFAULT 0 COMMENT '是否下次登录强制改密 1是 0否',
-    create_time          DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    update_time          DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    create_time          DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    update_time          DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    created_by           VARCHAR(64)     DEFAULT NULL COMMENT '创建人',
+    updated_by           VARCHAR(64)     DEFAULT NULL COMMENT '更新人',
     PRIMARY KEY (id),
     UNIQUE KEY uk_username (username),
     UNIQUE KEY uk_mobile (mobile)
@@ -27,6 +29,10 @@ CREATE TABLE IF NOT EXISTS sys_role (
     role_name   VARCHAR(64)     NOT NULL COMMENT '角色名称',
     remark      VARCHAR(255)    DEFAULT NULL COMMENT '说明',
     enabled     TINYINT(1)      NOT NULL DEFAULT 1 COMMENT '状态 1启用 0禁用',
+    create_time DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    update_time DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    created_by  VARCHAR(64)     DEFAULT NULL COMMENT '创建人',
+    updated_by  VARCHAR(64)     DEFAULT NULL COMMENT '更新人',
     PRIMARY KEY (id),
     UNIQUE KEY uk_role_code (role_code)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT = '角色表';
@@ -36,6 +42,10 @@ CREATE TABLE IF NOT EXISTS sys_permission (
     perm_code    VARCHAR(64)     NOT NULL COMMENT '权限编码，如 product:add 或 system-email:read',
     perm_name    VARCHAR(64)     NOT NULL COMMENT '权限说明',
     service_code VARCHAR(64)     NOT NULL DEFAULT 'system' COMMENT '所属产品/服务',
+    create_time  DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    update_time  DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    created_by   VARCHAR(64)     DEFAULT NULL COMMENT '创建人',
+    updated_by   VARCHAR(64)     DEFAULT NULL COMMENT '更新人',
     PRIMARY KEY (id),
     UNIQUE KEY uk_perm_code (perm_code),
     KEY idx_service_code (service_code)

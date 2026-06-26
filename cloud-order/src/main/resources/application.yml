@@ -1,12 +1,4 @@
-# 订单服务本地引导配置：仅连接 Nacos，其余（数据源/MyBatis/日志）全部来自 Nacos
-#   cloud-common.yaml —— 共享配置（MyBatis-Plus/日志）
-#   cloud-order.yaml   —— 本服务私有配置（数据源/Feign 日志）
-server:
-  port: 8002
-
 spring:
-  application:
-    name: cloud-order
   cloud:
     nacos:
       server-addr: ${NACOS_ADDR:127.0.0.1:8848}

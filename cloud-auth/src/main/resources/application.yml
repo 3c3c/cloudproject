@@ -1,12 +1,4 @@
-# 认证服务本地引导配置：仅连接 Nacos，其余（数据源/Redis/JWT/MyBatis/日志）全部来自 Nacos
-#   cloud-common.yaml —— 共享配置
-#   cloud-auth.yaml    —— 本服务私有配置（数据源等）
-server:
-  port: 7001
-
 spring:
-  application:
-    name: cloud-auth
   cloud:
     nacos:
       server-addr: ${NACOS_ADDR:127.0.0.1:8848}

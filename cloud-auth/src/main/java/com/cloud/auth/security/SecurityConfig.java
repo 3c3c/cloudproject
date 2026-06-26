@@ -1,7 +1,7 @@
 package com.cloud.auth.security;
 
 import com.cloud.auth.dto.login.LoginResponse;
-import com.cloud.auth.service.AuthService;
+import com.cloud.auth.security.TokenService;
 import com.cloud.common.result.Result;
 import com.cloud.common.result.ResultCode;
 import com.cloud.common.security.LoginUser;
@@ -50,7 +50,7 @@ public class SecurityConfig {
     private final MobileAuthenticationProvider mobileAuthenticationProvider;
     private final RestAuthenticationEntryPoint authenticationEntryPoint;
     private final RestAccessDeniedHandler accessDeniedHandler;
-    private final AuthService authService;
+    private final TokenService tokenService;
     private final ObjectMapper objectMapper;
 
     @Bean
@@ -61,7 +61,7 @@ public class SecurityConfig {
         mobileFilter.setAuthenticationManager(authenticationManager(authConfig));
         mobileFilter.setAuthenticationSuccessHandler((request, response, authentication) -> {
             LoginUser loginUser = (LoginUser) authentication.getPrincipal();
-            LoginResponse resp = authService.issueToken(loginUser);
+            LoginResponse resp = tokenService.issueToken(loginUser);
             writeJson(response, Result.ok(resp), HttpServletResponse.SC_OK);
         });
         mobileFilter.setAuthenticationFailureHandler((request, response, exception) ->

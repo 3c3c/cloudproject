@@ -17,7 +17,6 @@ import com.cloud.common.security.LoginUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -34,7 +33,6 @@ public class UserServiceImpl implements UserService {
     private static final Long DEFAULT_USER_ROLE_ID = 2L;
 
     private final SysUserMapper userMapper;
-    private final PasswordEncoder passwordEncoder;
     private final UserConverter userConverter;
 
     @Override
@@ -57,7 +55,7 @@ public class UserServiceImpl implements UserService {
         SysUser user = new SysUser();
         user.setUsername(req.getUsername());
         user.setNickname(req.getNickname());
-        user.setPassword(passwordEncoder.encode(req.getPassword()));
+        user.setPassword(req.getPassword());
         user.setMobile(StringUtils.hasText(req.getMobile()) ? req.getMobile() : null);
         user.setEmail(req.getEmail());
         user.setEnabled(1);
@@ -107,8 +105,6 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public UserResponse createUser(UserRequest request) {
         SysUser user = userConverter.toEntity(request);
-        // 加密密码
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
         // 创建时默认启用
         if (user.getEnabled() == null) {
             user.setEnabled(1);
@@ -132,7 +128,7 @@ public class UserServiceImpl implements UserService {
 
         // 如果提供了新密码，则加密更新
         if (request.getPassword() != null && !request.getPassword().trim().isEmpty()) {
-            user.setPassword(passwordEncoder.encode(user.getPassword()));
+            user.setPassword(user.getPassword());
         } else {
             // 否则保持原密码
             user.setPassword(existing.getPassword());

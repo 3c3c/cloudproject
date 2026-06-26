@@ -1,12 +1,4 @@
-# 商品服务本地引导配置：仅连接 Nacos，其余（数据源/MyBatis/日志）全部来自 Nacos
-#   cloud-common.yaml  —— 共享配置（MyBatis-Plus/日志）
-#   cloud-product.yaml —— 本服务私有配置（数据源）
-server:
-  port: 8001
-
 spring:
-  application:
-    name: cloud-product
   cloud:
     nacos:
       server-addr: ${NACOS_ADDR:127.0.0.1:8848}
