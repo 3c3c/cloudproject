@@ -4,6 +4,7 @@ import com.cloud.auth.dto.login.LoginRequest;
 import com.cloud.auth.dto.login.LoginResponse;
 import com.cloud.auth.security.TokenService;
 import com.cloud.auth.service.AuthService;
+import com.cloud.auth.service.RSAService;
 import com.cloud.common.constant.RedisConstants;
 import com.cloud.common.jwt.JwtUtils;
 import com.cloud.common.security.LoginUser;
@@ -28,13 +29,26 @@ public class AuthServiceImpl implements AuthService {
     private final TokenService tokenService;
     private final JwtUtils jwtUtils;
     private final StringRedisTemplate redisTemplate;
+    private final RSAService rsaService;
 
     @Override
     public LoginResponse login(LoginRequest req) {
+        // 1. 使用RSA私钥解密前端传来的加密密码
+        String plainPassword;
+        try {
+            plainPassword = rsaService.decryptPassword(req.getPassword());
+            log.info("用户 [{}] 密码解密成功", req.getUsername());
+        } catch (Exception e) {
+            log.error("用户 [{}] 密码解密失败", req.getUsername(), e);
+            throw new RuntimeException("密码解密失败: " + e.getMessage());
+        }
+
+        // 2. 使用解密后的明文密码进行Spring Security认证
         UsernamePasswordAuthenticationToken authToken =
-                new UsernamePasswordAuthenticationToken(req.getUsername(), req.getPassword());
+                new UsernamePasswordAuthenticationToken(req.getUsername(), plainPassword);
         Authentication authentication = authenticationManager.authenticate(authToken);
         LoginUser loginUser = (LoginUser) authentication.getPrincipal();
+
         return issueToken(loginUser);
     }
 

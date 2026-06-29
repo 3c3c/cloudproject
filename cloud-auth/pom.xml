@@ -79,6 +79,12 @@
             <artifactId>lombok-mapstruct-binding</artifactId>
             <scope>provided</scope>
         </dependency>
+
+        <!-- Hutool工具类 - 用于RSA加密 -->
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-all</artifactId>
+        </dependency>
     </dependencies>
 
     <build>

@@ -1,5 +1,6 @@
 package com.cloud.auth.controller;
 
+import cn.hutool.crypto.asymmetric.RSA;
 import com.cloud.auth.dto.login.LoginRequest;
 import com.cloud.auth.dto.login.LoginResponse;
 import com.cloud.auth.dto.register.RegisterRequest;
@@ -9,6 +10,7 @@ import com.cloud.auth.service.UserService;
 import com.cloud.common.result.Result;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -26,10 +28,23 @@ public class AuthController {
 
     private final AuthService authService;
     private final UserService userService;
+    private final RSA rsaObject;
 
     @PostMapping("/login")
     public Result<LoginResponse> login(@Valid @RequestBody LoginRequest req) {
         return Result.ok(authService.login(req));
+    }
+
+    /**
+     * 获取RSA公钥接口
+     * 前端调用此接口获取公钥，用于加密登录密码
+     *
+     * @return Base64编码的公钥字符串
+     */
+    @GetMapping("/public-key")
+    public Result<String> getPublicKey() {
+        String publicKeyBase64 = rsaObject.getPublicKeyBase64();
+        return Result.ok(publicKeyBase64);
     }
 
     @PostMapping("/register")

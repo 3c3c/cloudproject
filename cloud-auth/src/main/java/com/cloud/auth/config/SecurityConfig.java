@@ -1,11 +1,12 @@
-package com.cloud.auth.security;
+package com.cloud.auth.config;
 
 import com.cloud.auth.dto.login.LoginResponse;
-import com.cloud.auth.security.TokenService;
+import com.cloud.auth.security.*;
 import com.cloud.common.result.Result;
 import com.cloud.common.result.ResultCode;
 import com.cloud.common.security.LoginUser;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -40,6 +41,7 @@ public class SecurityConfig {
 
     private static final String[] WHITELIST = {
             "/auth/login",
+            "/auth/public-key",
             "/auth/sms/send",
             "/auth/sms/login",
             "/auth/register",
@@ -52,6 +54,7 @@ public class SecurityConfig {
     private final RestAccessDeniedHandler accessDeniedHandler;
     private final TokenService tokenService;
     private final ObjectMapper objectMapper;
+    private final UserDetailsServiceImpl userDetailsService;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -79,6 +82,7 @@ public class SecurityConfig {
                         .authenticationEntryPoint(authenticationEntryPoint)
                         .accessDeniedHandler(accessDeniedHandler)
                 )
+                .authenticationProvider(daoAuthenticationProvider())
                 .authenticationProvider(mobileAuthenticationProvider)
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(mobileFilter, UsernamePasswordAuthenticationFilter.class);
@@ -89,6 +93,14 @@ public class SecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public DaoAuthenticationProvider daoAuthenticationProvider() {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+        provider.setUserDetailsService(userDetailsService);
+        provider.setPasswordEncoder(passwordEncoder());
+        return provider;
     }
 
     @Bean
