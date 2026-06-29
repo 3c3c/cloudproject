@@ -75,31 +75,24 @@ foreach ($config in $configs) {
         # Skip if config exists and content is same
         if ($existingConfig -and $existingConfig.Trim() -eq $Content.Trim()) {
             Write-Host "==> $($config.DataId) ... " -ForegroundColor Cyan -NoNewline
-            Write-Host "SKIP (already exists, same content)" -ForegroundColor Gray
+            Write-Host "SKIP (local and remote are the same)" -ForegroundColor Gray
             $skipCount++
         }
         else {
-            # Publish if config doesn't exist or content changed
-            Write-Host "==> Publishing $($config.DataId) ... " -ForegroundColor Cyan -NoNewline
+            # Pull config from Nacos to update local file
+            if ($existingConfig) {
+                Write-Host "==> $($config.DataId) ... " -ForegroundColor Cyan -NoNewline
+                Write-Host "SYNC (remote differs from local, pulling from Nacos)" -ForegroundColor Yellow
 
-            $ConfigUrl = "http://" + $NacosAddr + "/nacos/v1/cs/configs"
-            $body = @{
-                dataId = $config.DataId
-                group = $Group
-                tenant = $Namespace
-                type = "yaml"
-                accessToken = $Token
-                content = $Content
-            }
+                # Update local file with config from Nacos
+                $existingConfig | Out-File -FilePath $FilePath -Encoding UTF8 -NoNewline
 
-            $Response = Invoke-RestMethod -Uri $ConfigUrl -Method POST -Body $body
-
-            if ($Response -eq $true) {
-                Write-Host " OK" -ForegroundColor Green
+                Write-Host "      Local file updated: $FilePath" -ForegroundColor Green
                 $publishCount++
             }
             else {
-                Write-Host " FAILED: $Response" -ForegroundColor Red
+                Write-Host "==> $($config.DataId) ... " -ForegroundColor Cyan -NoNewline
+                Write-Host "WARNING (config not found in Nacos, skipping)" -ForegroundColor Yellow
             }
         }
     }

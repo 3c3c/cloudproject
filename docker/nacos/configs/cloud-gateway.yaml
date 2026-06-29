@@ -1,8 +1,8 @@
-# =====================================================================
-# cloud-gateway 私有配置（group: DEFAULT_GROUP, namespace: public）
-# 路由 + 白名单（Redis/JWT 来自 cloud-common.yaml）
-# =====================================================================
+﻿server:
+  port: 9527
 spring:
+  application:
+    name: cloud-gateway
   cloud:
     gateway:
       # 关闭按服务名自动生成路由，统一手动配置

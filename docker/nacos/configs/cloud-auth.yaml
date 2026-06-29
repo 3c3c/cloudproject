@@ -1,8 +1,8 @@
-# =====================================================================
-# cloud-auth 私有配置（group: DEFAULT_GROUP, namespace: public）
-# 数据源 + 建表初始化（schema.sql / data.sql 在 classpath 中）
-# =====================================================================
+﻿server:
+  port: 7001
 spring:
+  application:
+    name: cloud-auth
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://${MYSQL_HOST:127.0.0.1}:${MYSQL_PORT:3306}/cloud_auth?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&createDatabaseIfNotExist=true
