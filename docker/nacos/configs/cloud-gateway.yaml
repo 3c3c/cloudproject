@@ -4,6 +4,11 @@ spring:
   application:
     name: cloud-gateway
   cloud:
+    # 添加Nacos服务发现配置
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1:8848
+        enabled: true
     gateway:
       # 关闭按服务名自动生成路由，统一手动配置
       discovery:
