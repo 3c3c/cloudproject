@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.cloud.auth.entity.SysPermission;
 import com.cloud.auth.entity.SysRole;
 import com.cloud.auth.entity.SysUser;
+import org.apache.ibatis.annotations.Delete;
+import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -25,6 +27,19 @@ public interface SysUserMapper extends BaseMapper<SysUser> {
     SysUser selectByMobile(@Param("mobile") String mobile);
 
     /** 绑定用户角色（注册时赋予默认角色） */
-    @org.apache.ibatis.annotations.Insert("INSERT IGNORE INTO sys_user_role(user_id, role_id) VALUES(#{userId}, #{roleId})")
+    @Insert("INSERT IGNORE INTO sys_user_role(user_id, role_id) VALUES(#{userId}, #{roleId})")
     int bindRole(@Param("userId") Long userId, @Param("roleId") Long roleId);
+
+    /** 删除用户角色绑定关系（删除用户时同步删除） */
+    @Delete("DELETE FROM sys_user_role WHERE user_id = #{userId}")
+    int deleteUserRoles(@Param("userId") Long userId);
+
+    /** 批量删除用户角色绑定关系 */
+    @Delete("<script>" +
+            "DELETE FROM sys_user_role WHERE user_id IN " +
+            "<foreach item='item' index='index' collection='userIds' open='(' separator=',' close=')'>" +
+            "#{item}" +
+            "</foreach>" +
+            "</script>")
+    int batchDeleteUserRoles(@Param("userIds") List<Long> userIds);
 }

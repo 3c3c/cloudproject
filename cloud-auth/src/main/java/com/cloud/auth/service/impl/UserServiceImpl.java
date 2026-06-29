@@ -60,6 +60,8 @@ public class UserServiceImpl implements UserService {
         user.setEmail(req.getEmail());
         user.setEnabled(1);
         user.setMustChangePassword(false);
+        user.setCreatedBy(req.getUsername());
+        user.setUpdatedBy(req.getUsername());
         userMapper.insert(user);
         // 注册即赋予默认角色 ROLE_USER
         userMapper.bindRole(user.getId(), DEFAULT_USER_ROLE_ID);
@@ -144,6 +146,8 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void deleteUser(Long id) {
+        // 删除用户的同时，同步删除用户和角色的绑定关系
+        userMapper.deleteUserRoles(id);
         userMapper.deleteById(id);
     }
 
@@ -153,6 +157,8 @@ public class UserServiceImpl implements UserService {
         if (ids == null || ids.isEmpty()) {
             return;
         }
+        // 删除用户的同时，同步删除用户和角色的绑定关系
+        userMapper.batchDeleteUserRoles(ids);
         userMapper.deleteBatchIds(ids);
     }
 
