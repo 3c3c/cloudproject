@@ -9,3 +9,25 @@ spring:
     import:
       - optional:nacos:cloud-common.yaml
       - optional:nacos:cloud-gateway.yaml
+
+# 网关统一 CORS 配置
+gateway:
+  cors:
+    # 允许的源（可通过环境变量覆盖）
+    allowed-origins:
+      - "${CORS_ALLOWED_ORIGIN_1:http://localhost:8001}"
+      - "${CORS_ALLOWED_ORIGIN_2:http://localhost:5173}"
+      - "${CORS_ALLOWED_ORIGIN_3:http://localhost:8080}"
+      - "${CORS_ALLOWED_ORIGIN_4:}"
+      - "${CORS_ALLOWED_ORIGIN_5:}"
+    # 允许的 HTTP 方法
+    allowed-methods:
+      - GET
+      - POST
+      - PUT
+      - DELETE
+      - OPTIONS  # 必需：CORS 预检
+    # 暴露的响应头
+    exposed-headers:
+      - Content-Disposition
+      - Authorization

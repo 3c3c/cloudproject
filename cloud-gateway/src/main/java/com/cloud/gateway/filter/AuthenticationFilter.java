@@ -1,6 +1,6 @@
 package com.cloud.gateway.filter;
 
-import com.cloud.gateway.config.GatewayWhiteListProperties;
+import com.cloud.gateway.properties.GatewayWhiteListProperties;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
