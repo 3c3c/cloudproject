@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cloud.auth.dto.user.UserRequest;
 import com.cloud.auth.dto.user.UserResponse;
 import com.cloud.auth.service.UserService;
+import com.cloud.common.entity.BasePage;
 import com.cloud.common.result.Result;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +16,7 @@ import java.util.List;
  * 用户管理接口：增删改查、状态管理
  */
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/auth/users")
 @RequiredArgsConstructor
 public class UserController {
 
@@ -23,17 +24,14 @@ public class UserController {
 
     /**
      * 根据用户名称或者账号，分页查询用户列表的功能，列表上有用户账号、用户名称、用户状态
-     * @param current 当前页码
-     * @param size 每页大小
+     * @param basePage 分页参数
      * @param keyword 用户名或手机号（可选）
      * @return 用户分页列表
      */
     @GetMapping
-    public Result<Page<UserResponse>> page(
-            @RequestParam(defaultValue = "1") Integer current,
-            @RequestParam(defaultValue = "10") Integer size,
+    public Result<Page<UserResponse>> page(BasePage basePage,
             @RequestParam(required = false) String keyword) {
-        return Result.ok(userService.pageUsers(current, size, keyword));
+        return Result.ok(userService.pageUsers(basePage, keyword));
     }
 
     /**

@@ -3,6 +3,7 @@ package com.cloud.auth.service;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cloud.auth.dto.permission.PermissionRequest;
 import com.cloud.auth.dto.permission.PermissionResponse;
+import com.cloud.common.entity.BasePage;
 
 /**
  * 权限管理服务接口
@@ -37,7 +38,7 @@ public interface PermissionService {
     /**
      * 分页查询权限（支持按权限名称筛选）
      */
-    Page<PermissionResponse> page(Integer current, Integer size, String permName);
+    Page<PermissionResponse> page(BasePage basePage, String permName);
 
     /**
      * 按服务代码查询权限

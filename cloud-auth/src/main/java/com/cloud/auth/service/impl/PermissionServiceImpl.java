@@ -8,6 +8,7 @@ import com.cloud.auth.dto.permission.PermissionResponse;
 import com.cloud.auth.entity.SysPermission;
 import com.cloud.auth.mapper.SysPermissionMapper;
 import com.cloud.auth.service.PermissionService;
+import com.cloud.common.entity.BasePage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -68,8 +69,8 @@ public class PermissionServiceImpl implements PermissionService {
     }
 
     @Override
-    public Page<PermissionResponse> page(Integer current, Integer size, String permName) {
-        Page<SysPermission> page = new Page<>(current, size);
+    public Page<PermissionResponse> page(BasePage basePage, String permName) {
+        Page<SysPermission> page = new Page<>(basePage.getCurrent(), basePage.getSize());
         LambdaQueryWrapper<SysPermission> wrapper = new LambdaQueryWrapper<>();
 
         if (permName != null && !permName.trim().isEmpty()) {
@@ -78,9 +79,10 @@ public class PermissionServiceImpl implements PermissionService {
 
         permissionMapper.selectPage(page, wrapper);
 
-        // 转换为Response DTO分页对象
-        Page<PermissionResponse> responsePage = new Page<>(current, size, page.getTotal());
+        // 转换为Response DTO分页对象，复制所有分页信息
+        Page<PermissionResponse> responsePage = new Page<>(page.getCurrent(), page.getSize(), page.getTotal());
         responsePage.setRecords(permissionConverter.toResponseList(page.getRecords()));
+        responsePage.setPages(page.getPages());
         return responsePage;
     }
 

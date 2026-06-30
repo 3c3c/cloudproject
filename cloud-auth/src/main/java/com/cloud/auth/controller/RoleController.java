@@ -1,9 +1,11 @@
 package com.cloud.auth.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.cloud.auth.dto.role.BatchUpdateStatusRequest;
 import com.cloud.auth.dto.role.RoleRequest;
 import com.cloud.auth.dto.role.RoleResponse;
 import com.cloud.auth.service.RoleService;
+import com.cloud.common.entity.BasePage;
 import com.cloud.common.result.Result;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +17,7 @@ import java.util.List;
  * 角色管理接口：增删改查、状态管理
  */
 @RestController
-@RequestMapping("/roles")
+@RequestMapping("/auth/roles")
 @RequiredArgsConstructor
 public class RoleController {
 
@@ -23,17 +25,14 @@ public class RoleController {
 
     /**
      * 根据角色名称分页查询所有角色的功能
-     * @param current 当前页码
-     * @param size 每页大小
+     * @param basePage 分页参数
      * @param roleName 角色名称（可选）
      * @return 角色分页列表
      */
     @GetMapping
-    public Result<Page<RoleResponse>> page(
-            @RequestParam(defaultValue = "1") Integer current,
-            @RequestParam(defaultValue = "10") Integer size,
+    public Result<Page<RoleResponse>> page(BasePage basePage,
             @RequestParam(required = false) String roleName) {
-        return Result.ok(roleService.page(current, size, roleName));
+        return Result.ok(roleService.page(basePage, roleName));
     }
 
     /**
@@ -100,4 +99,17 @@ public class RoleController {
         roleService.updateStatus(id, enabled);
         return Result.ok();
     }
+
+    /**
+     * 批量更新角色状态功能
+     * @param request 批量更新请求（包含角色ID列表和状态值）
+     * @return 更新结果
+     */
+    @PutMapping("/batch/status")
+    public Result<Void> batchUpdateStatus(@Valid @RequestBody BatchUpdateStatusRequest request) {
+        roleService.batchUpdateStatus(request.getIds(), request.getEnabled());
+        return Result.ok();
+    }
+
+
 }

@@ -5,6 +5,7 @@ import com.cloud.auth.dto.register.RegisterRequest;
 import com.cloud.auth.dto.user.UserRequest;
 import com.cloud.auth.dto.user.UserResponse;
 import com.cloud.auth.entity.SysUser;
+import com.cloud.common.entity.BasePage;
 import com.cloud.common.security.LoginUser;
 
 /**
@@ -44,7 +45,7 @@ public interface UserService {
     UserResponse getUserById(Long id);
 
     /** 分页查询用户（支持按用户名或手机号筛选） */
-    Page<UserResponse> pageUsers(Integer current, Integer size, String keyword);
+    Page<UserResponse> pageUsers(BasePage basePage, String keyword);
 
     /** 更新用户状态 */
     void updateUserStatus(Long id, Integer enabled);

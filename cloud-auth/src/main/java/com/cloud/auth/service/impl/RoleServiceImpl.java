@@ -8,6 +8,7 @@ import com.cloud.auth.dto.role.RoleResponse;
 import com.cloud.auth.entity.SysRole;
 import com.cloud.auth.mapper.SysRoleMapper;
 import com.cloud.auth.service.RoleService;
+import com.cloud.common.entity.BasePage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -74,8 +75,8 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    public Page<RoleResponse> page(Integer current, Integer size, String roleName) {
-        Page<SysRole> page = new Page<>(current, size);
+    public Page<RoleResponse> page(BasePage basePage, String roleName) {
+        Page<SysRole> page = new Page<>(basePage.getCurrent(), basePage.getSize());
         LambdaQueryWrapper<SysRole> wrapper = new LambdaQueryWrapper<>();
 
         if (roleName != null && !roleName.trim().isEmpty()) {
@@ -84,9 +85,10 @@ public class RoleServiceImpl implements RoleService {
 
         roleMapper.selectPage(page, wrapper);
 
-        // 转换为Response DTO分页对象
-        Page<RoleResponse> responsePage = new Page<>(current, size, page.getTotal());
+        // 转换为Response DTO分页对象，复制所有分页信息
+        Page<RoleResponse> responsePage = new Page<>(page.getCurrent(), page.getSize(), page.getTotal());
         responsePage.setRecords(roleConverter.toResponseList(page.getRecords()));
+        responsePage.setPages(page.getPages());
         return responsePage;
     }
 
@@ -97,5 +99,20 @@ public class RoleServiceImpl implements RoleService {
         role.setId(id);
         role.setEnabled(enabled);
         roleMapper.updateById(role);
+    }
+
+    @Override
+    @Transactional
+    public void batchUpdateStatus(java.util.List<Long> ids, Integer enabled) {
+        if (ids == null || ids.isEmpty()) {
+            return;
+        }
+        // 批量更新角色状态
+        for (Long id : ids) {
+            SysRole role = new SysRole();
+            role.setId(id);
+            role.setEnabled(enabled);
+            roleMapper.updateById(role);
+        }
     }
 }

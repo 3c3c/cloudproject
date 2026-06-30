@@ -12,6 +12,7 @@ import com.cloud.auth.entity.SysUser;
 import com.cloud.auth.mapper.SysUserMapper;
 import com.cloud.auth.service.RSAService;
 import com.cloud.auth.service.UserService;
+import com.cloud.common.entity.BasePage;
 import com.cloud.common.exception.BusinessException;
 import com.cloud.common.result.ResultCode;
 import com.cloud.common.security.LoginUser;
@@ -191,8 +192,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Page<UserResponse> pageUsers(Integer current, Integer size, String keyword) {
-        Page<SysUser> page = new Page<>(current, size);
+    public Page<UserResponse> pageUsers(BasePage basePage, String keyword) {
+        Page<SysUser> page = new Page<>(basePage.getCurrent(), basePage.getSize());
         LambdaQueryWrapper<SysUser> wrapper = new LambdaQueryWrapper<>();
 
         if (keyword != null && !keyword.trim().isEmpty()) {
@@ -204,8 +205,8 @@ public class UserServiceImpl implements UserService {
 
         userMapper.selectPage(page, wrapper);
 
-        // 转换为Response DTO分页对象
-        Page<UserResponse> responsePage = new Page<>(current, size, page.getTotal());
+        // 转换为Response DTO分页对象，复制所有分页信息
+        Page<UserResponse> responsePage = new Page<>(page.getCurrent(), page.getSize(), page.getTotal());
         responsePage.setRecords(page.getRecords().stream()
                 .map(user -> {
                     // 返回时不包含密码
@@ -213,6 +214,7 @@ public class UserServiceImpl implements UserService {
                     return userConverter.toResponse(user);
                 })
                 .collect(Collectors.toList()));
+        responsePage.setPages(page.getPages());
         return responsePage;
     }
 

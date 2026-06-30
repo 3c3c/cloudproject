@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cloud.admin.dto.DictRequest;
 import com.cloud.admin.dto.DictResponse;
 import com.cloud.admin.service.DictService;
+import com.cloud.common.entity.BasePage;
 import com.cloud.common.result.Result;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -23,17 +24,14 @@ public class DictController {
 
     /**
      * 根据字典名称分页查询全部字典列表功能
-     * @param current 当前页码
-     * @param size 每页大小
+     * @param basePage 分页参数
      * @param dictName 字典名称（可选）
      * @return 字典分页列表
      */
     @GetMapping
-    public Result<Page<DictResponse>> page(
-            @RequestParam(defaultValue = "1") Integer current,
-            @RequestParam(defaultValue = "10") Integer size,
+    public Result<Page<DictResponse>> page(BasePage basePage,
             @RequestParam(required = false) String dictName) {
-        return Result.ok(dictService.page(current, size, dictName));
+        return Result.ok(dictService.page(basePage, dictName));
     }
 
     /**

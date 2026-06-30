@@ -3,6 +3,7 @@ package com.cloud.admin.service;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cloud.admin.dto.DictRequest;
 import com.cloud.admin.dto.DictResponse;
+import com.cloud.common.entity.BasePage;
 
 /**
  * 字典管理服务接口
@@ -37,7 +38,7 @@ public interface DictService {
     /**
      * 分页查询字典（支持按字典名称筛选）
      */
-    Page<DictResponse> page(Integer current, Integer size, String dictName);
+    Page<DictResponse> page(BasePage basePage, String dictName);
 
     /**
      * 按字典类型查询字典列表

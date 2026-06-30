@@ -3,6 +3,7 @@ package com.cloud.auth.service;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cloud.auth.dto.role.RoleRequest;
 import com.cloud.auth.dto.role.RoleResponse;
+import com.cloud.common.entity.BasePage;
 
 /**
  * 角色管理服务接口
@@ -37,10 +38,15 @@ public interface RoleService {
     /**
      * 分页查询角色（支持按角色名称筛选）
      */
-    Page<RoleResponse> page(Integer current, Integer size, String roleName);
+    Page<RoleResponse> page(BasePage basePage, String roleName);
 
     /**
      * 更新角色状态
      */
     void updateStatus(Long id, Integer enabled);
+
+    /**
+     * 批量更新角色状态
+     */
+    void batchUpdateStatus(java.util.List<Long> ids, Integer enabled);
 }

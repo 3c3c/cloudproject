@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cloud.auth.dto.permission.PermissionRequest;
 import com.cloud.auth.dto.permission.PermissionResponse;
 import com.cloud.auth.service.PermissionService;
+import com.cloud.common.entity.BasePage;
 import com.cloud.common.result.Result;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +16,7 @@ import java.util.List;
  * 权限管理接口：增删改查、按服务查询
  */
 @RestController
-@RequestMapping("/permissions")
+@RequestMapping("/auth/permissions")
 @RequiredArgsConstructor
 public class PermissionController {
 
@@ -23,17 +24,14 @@ public class PermissionController {
 
     /**
      * 根据权限名称分页查询全部权限列表功能
-     * @param current 当前页码
-     * @param size 每页大小
+     * @param basePage 分页参数
      * @param permName 权限名称（可选）
      * @return 权限分页列表
      */
     @GetMapping
-    public Result<Page<PermissionResponse>> page(
-            @RequestParam(defaultValue = "1") Integer current,
-            @RequestParam(defaultValue = "10") Integer size,
+    public Result<Page<PermissionResponse>> page(BasePage basePage,
             @RequestParam(required = false) String permName) {
-        return Result.ok(permissionService.page(current, size, permName));
+        return Result.ok(permissionService.page(basePage, permName));
     }
 
     /**
