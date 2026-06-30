@@ -1,6 +1,7 @@
 package com.cloud.auth.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.cloud.auth.dto.user.BatchUpdateUserStatusRequest;
 import com.cloud.auth.dto.user.UserInfoRequest;
 import com.cloud.auth.dto.user.UserRequest;
 import com.cloud.auth.dto.user.UserResponse;
@@ -66,9 +67,9 @@ public class UserController {
      */
     // @PreAuthorize("hasAuthority('user:delete')")
     @DeleteMapping("/{id}")
-    public Result<Void> delete(@PathVariable Long id) {
+    public Result<Boolean> delete(@PathVariable Long id) {
         userService.deleteUser(id);
-        return Result.ok();
+        return Result.ok(true);
     }
 
     /**
@@ -78,9 +79,9 @@ public class UserController {
      */
     // @PreAuthorize("hasAuthority('user:delete')")
     @DeleteMapping("/batch")
-    public Result<Void> batchDelete(@RequestBody List<Long> ids) {
+    public Result<Boolean> batchDelete(@RequestBody List<Long> ids) {
         userService.batchDeleteUsers(ids);
-        return Result.ok();
+        return Result.ok(true);
     }
 
     /**
@@ -102,9 +103,21 @@ public class UserController {
      */
     // @PreAuthorize("hasAuthority('user:update')")
     @PutMapping("/{id}/status")
-    public Result<Void> updateStatus(@PathVariable Long id, @RequestParam Integer enabled) {
+    public Result<Boolean> updateStatus(@PathVariable Long id, @RequestParam Integer enabled) {
         userService.updateUserStatus(id, enabled);
-        return Result.ok();
+        return Result.ok(true);
+    }
+
+    /**
+     * 批量更新用户状态功能
+     * @param request 批量更新请求
+     * @return 更新结果
+     */
+    // @PreAuthorize("hasAuthority('user:update')")
+    @PutMapping("/batch/status")
+    public Result<Boolean> batchUpdateStatus(@Valid @RequestBody BatchUpdateUserStatusRequest request) {
+        userService.batchUpdateUserStatus(request.getUserIds(), request.getEnabled());
+        return Result.ok(true);
     }
 
 

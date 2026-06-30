@@ -9,7 +9,6 @@ import com.cloud.common.entity.BasePage;
 import com.cloud.common.result.Result;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -101,9 +100,9 @@ public class RoleController {
      */
     // @PreAuthorize("hasAuthority('role:update')")
     @PutMapping("/{id}/status")
-    public Result<Void> updateStatus(@PathVariable Long id, @RequestParam Integer enabled) {
+    public Result<Boolean> updateStatus(@PathVariable Long id, @RequestParam Integer enabled) {
         roleService.updateStatus(id, enabled);
-        return Result.ok();
+        return Result.ok(true);
     }
 
     /**
@@ -123,10 +122,29 @@ public class RoleController {
      */
     // @PreAuthorize("hasAuthority('role:update')")
     @PutMapping("/batch/status")
-    public Result<Void> batchUpdateStatus(@Valid @RequestBody BatchUpdateStatusRequest request) {
+    public Result<Boolean> batchUpdateStatus(@Valid @RequestBody BatchUpdateStatusRequest request) {
         roleService.batchUpdateStatus(request.getIds(), request.getEnabled());
-        return Result.ok();
+        return Result.ok(true);
     }
+
+    //
+
+
+    /**
+     * 根据用户查询当前用户还没拥有的所有角色，可以根据角色名称搜索
+     * @param userId 用户ID
+     * @param roleName 角色名称（可选，支持模糊搜索）
+     * @return 用户未拥有的角色列表
+     */
+    // @PreAuthorize("hasAuthority('role:query')")
+    @GetMapping("/not-assigned")
+    public Result<List<RoleResponse>> getRolesNotAssignedToUser(
+            @RequestParam Long userId,
+            @RequestParam(required = false) String roleName) {
+        return Result.ok(roleService.getRolesNotAssignedToUser(userId, roleName));
+    }
+
+
 
 
 }

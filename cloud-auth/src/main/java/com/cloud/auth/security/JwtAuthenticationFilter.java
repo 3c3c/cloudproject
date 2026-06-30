@@ -64,7 +64,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        // ✅ 从 JWT Claims 构建认证信息（不查询数据库，解决循环依赖）
         if (SecurityContextHolder.getContext().getAuthentication() == null) {
             LoginUser loginUser = buildLoginUserFromClaims(claims);
             UsernamePasswordAuthenticationToken authentication =

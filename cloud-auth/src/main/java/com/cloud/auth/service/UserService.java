@@ -9,6 +9,8 @@ import com.cloud.auth.entity.SysUser;
 import com.cloud.common.entity.BasePage;
 import com.cloud.common.security.LoginUser;
 
+import java.util.List;
+
 /**
  * 用户服务接口：认证相关 + 用户管理
  */
@@ -40,7 +42,7 @@ public interface UserService {
     void deleteUser(Long id);
 
     /** 批量删除用户 */
-    void batchDeleteUsers(java.util.List<Long> ids);
+    void batchDeleteUsers(List<Long> ids);
 
     /** 根据ID查询用户 */
     UserResponse getUserById(Long id);
@@ -52,5 +54,5 @@ public interface UserService {
     void updateUserStatus(Long id, Integer enabled);
 
     /** 批量更新用户状态 */
-    void batchUpdateUserStatus(java.util.List<Long> ids, Integer enabled);
+    void batchUpdateUserStatus(List<Long> ids, Integer enabled);
 }

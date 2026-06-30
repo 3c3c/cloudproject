@@ -7,13 +7,16 @@ import com.cloud.auth.dto.role.RoleRequest;
 import com.cloud.auth.dto.role.RoleResponse;
 import com.cloud.auth.entity.SysRole;
 import com.cloud.auth.mapper.SysRoleMapper;
+import com.cloud.auth.mapper.SysUserMapper;
 import com.cloud.auth.service.RoleService;
 import com.cloud.common.entity.BasePage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 角色管理服务实现类
@@ -24,6 +27,7 @@ public class RoleServiceImpl implements RoleService {
 
     private final SysRoleMapper roleMapper;
     private final RoleConverter roleConverter;
+    private final SysUserMapper userMapper;
 
     @Override
     @Transactional
@@ -118,6 +122,35 @@ public class RoleServiceImpl implements RoleService {
     public List<RoleResponse> getAllEnabledRoles() {
         LambdaQueryWrapper<SysRole> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(SysRole::getEnabled, 1);  // 只查询启用的角色
+        List<SysRole> roles = roleMapper.selectList(wrapper);
+        return roleConverter.toResponseList(roles);
+    }
+
+    @Override
+    public List<RoleResponse> getRolesNotAssignedToUser(Long userId, String roleName) {
+        // 1. 查询该用户已拥有的角色 ID 列表
+        List<com.cloud.auth.entity.SysRole> userRoles = userMapper.selectRolesByUserId(userId);
+        List<Long> userRoleIds = userRoles.stream()
+                .map(com.cloud.auth.entity.SysRole::getId)
+                .collect(Collectors.toList());
+
+        // 2. 查询所有启用且未被分配的角色
+        LambdaQueryWrapper<SysRole> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(SysRole::getEnabled, 1);  // 只查询启用的角色
+
+        // 如果用户已有角色，排除这些角色
+        if (userRoleIds != null && !userRoleIds.isEmpty()) {
+            wrapper.notIn(SysRole::getId, userRoleIds);
+        }
+
+        // 如果提供了角色名称，进行模糊搜索
+        if (StringUtils.hasText(roleName)) {
+            wrapper.like(SysRole::getRoleName, roleName);
+        }
+
+        // 3. 按角色名称排序
+        wrapper.orderByAsc(SysRole::getRoleName);
+
         List<SysRole> roles = roleMapper.selectList(wrapper);
         return roleConverter.toResponseList(roles);
     }

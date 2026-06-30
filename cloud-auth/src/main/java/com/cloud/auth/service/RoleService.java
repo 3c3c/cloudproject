@@ -54,4 +54,12 @@ public interface RoleService {
      * 查询所有启用的角色
      */
     java.util.List<RoleResponse> getAllEnabledRoles();
+
+    /**
+     * 根据用户查询当前用户还没拥有的所有角色，可以根据角色名称搜索
+     * @param userId 用户ID
+     * @param roleName 角色名称（可选，支持模糊搜索）
+     * @return 用户未拥有的角色列表
+     */
+    java.util.List<RoleResponse> getRolesNotAssignedToUser(Long userId, String roleName);
 }
