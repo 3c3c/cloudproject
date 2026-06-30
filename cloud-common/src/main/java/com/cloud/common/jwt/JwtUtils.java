@@ -27,7 +27,8 @@ public class JwtUtils {
     private final JwtProperties properties;
 
     /** 生成 token */
-    public String generateToken(String username, Long userId, Collection<? extends GrantedAuthority> authorities) {
+    public String generateToken(String username, Long userId, Collection<? extends GrantedAuthority> authorities,
+                                String nickname, String mobile, String email, String avatar, Boolean mustChangePassword) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + properties.getExpiration());
 
@@ -39,6 +40,11 @@ public class JwtUtils {
                 .setSubject(username)
                 .claim("userId", userId)
                 .claim("authorities", authoritiesStr)
+                .claim("nickname", nickname)
+                .claim("mobile", mobile)
+                .claim("email", email)
+                .claim("avatar", avatar)
+                .claim("mustChangePassword", mustChangePassword)
                 .setIssuedAt(now)
                 .setExpiration(expiryDate)
                 .signWith(Keys.hmacShaKeyFor(properties.getSecret().getBytes(StandardCharsets.UTF_8)),

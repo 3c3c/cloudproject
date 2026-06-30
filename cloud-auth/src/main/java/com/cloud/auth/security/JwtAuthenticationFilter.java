@@ -83,6 +83,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         Long userId = claims.get("userId", Long.class);
         String username = claims.getSubject();
         String authorities = claims.get("authorities", String.class);
+        String nickname = claims.get("nickname", String.class);
+        String mobile = claims.get("mobile", String.class);
+        String email = claims.get("email", String.class);
+        String avatar = claims.get("avatar", String.class);
+        Boolean mustChangePassword = claims.get("mustChangePassword", Boolean.class);
 
         // 解析 authorities 字符串为权限列表
         List<org.springframework.security.core.GrantedAuthority> authorityList =
@@ -93,6 +98,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         .collect(Collectors.toList());
 
         // 构建轻量级 LoginUser（密码字段可为null，因为已通过JWT验证）
-        return new LoginUser(userId, username, null, null, authorityList);
+        LoginUser loginUser = new LoginUser(userId, username, null, null, authorityList);
+        loginUser.setNickname(nickname);
+        loginUser.setMobile(mobile);
+        loginUser.setEmail(email);
+        loginUser.setAvatar(avatar);
+        loginUser.setMustChangePassword(mustChangePassword);
+        return loginUser;
     }
 }

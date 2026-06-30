@@ -15,6 +15,9 @@ public class LoginResponse {
     private String tokenHead;
     private Long userId;
     private String username;
+    private String nickname;
+    private String mobile;
+    private String email;
     private String avatar;
     private List<String> authorities;
     private Boolean mustChangePassword;

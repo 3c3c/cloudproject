@@ -31,7 +31,12 @@ public class TokenService {
         String token = jwtUtils.generateToken(
                 loginUser.getUsername(),
                 loginUser.getUserId(),
-                loginUser.getAuthorities()
+                loginUser.getAuthorities(),
+                loginUser.getNickname(),
+                loginUser.getMobile(),
+                loginUser.getEmail(),
+                loginUser.getAvatar(),
+                loginUser.getMustChangePassword()
         );
 
         // 写入 Redis：login:token:{username} -> token
@@ -51,6 +56,9 @@ public class TokenService {
                 jwtUtils.getTokenPrefix(),
                 loginUser.getUserId(),
                 loginUser.getUsername(),
+                loginUser.getNickname(),
+                loginUser.getMobile(),
+                loginUser.getEmail(),
                 loginUser.getAvatar(),
                 authorities,
                 Boolean.TRUE.equals(loginUser.getMustChangePassword())
