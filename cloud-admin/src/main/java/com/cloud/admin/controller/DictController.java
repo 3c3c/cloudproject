@@ -8,6 +8,7 @@ import com.cloud.common.entity.BasePage;
 import com.cloud.common.result.Result;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -28,6 +29,7 @@ public class DictController {
      * @param dictName 字典名称（可选）
      * @return 字典分页列表
      */
+    @PreAuthorize("hasAuthority('dict:query')")
     @GetMapping
     public Result<Page<DictResponse>> page(BasePage basePage,
             @RequestParam(required = false) String dictName) {
@@ -39,6 +41,7 @@ public class DictController {
      * @param request 字典创建请求
      * @return 创建的字典信息
      */
+    @PreAuthorize("hasAuthority('dict:update')")
     @PostMapping
     public Result<DictResponse> create(@Valid @RequestBody DictRequest request) {
         return Result.ok(dictService.create(request));
@@ -50,6 +53,7 @@ public class DictController {
      * @param request 字典编辑请求
      * @return 编辑后的字典信息
      */
+    @PreAuthorize("hasAuthority('dict:update')")
     @PutMapping("/{id}")
     public Result<DictResponse> update(@PathVariable Long id, @Valid @RequestBody DictRequest request) {
         return Result.ok(dictService.update(id, request));
@@ -60,6 +64,7 @@ public class DictController {
      * @param id 字典ID
      * @return 删除结果
      */
+    @PreAuthorize("hasAuthority('dict:delete')")
     @DeleteMapping("/{id}")
     public Result<Void> delete(@PathVariable Long id) {
         dictService.delete(id);
@@ -71,6 +76,7 @@ public class DictController {
      * @param ids 字典ID列表
      * @return 删除结果
      */
+    @PreAuthorize("hasAuthority('dict:delete')")
     @DeleteMapping("/batch")
     public Result<Void> batchDelete(@RequestBody List<Long> ids) {
         dictService.batchDelete(ids);
@@ -82,6 +88,7 @@ public class DictController {
      * @param id 字典ID
      * @return 字典信息
      */
+    @PreAuthorize("hasAuthority('dict:query')")
     @GetMapping("/{id}")
     public Result<DictResponse> getById(@PathVariable Long id) {
         return Result.ok(dictService.getById(id));
@@ -92,6 +99,7 @@ public class DictController {
      * @param dictType 字典类型
      * @return 字典列表
      */
+    @PreAuthorize("hasAuthority('dict:query')")
     @GetMapping("/by-type/{dictType}")
     public Result<List<DictResponse>> getByDictType(@PathVariable String dictType) {
         return Result.ok(dictService.getByDictType(dictType));

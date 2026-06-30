@@ -13,6 +13,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 /**
  * 角色管理服务实现类
  */
@@ -75,13 +77,9 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    public Page<RoleResponse> page(BasePage basePage, String roleName) {
+    public Page<RoleResponse> page(BasePage basePage) {
         Page<SysRole> page = new Page<>(basePage.getCurrent(), basePage.getSize());
         LambdaQueryWrapper<SysRole> wrapper = new LambdaQueryWrapper<>();
-
-        if (roleName != null && !roleName.trim().isEmpty()) {
-            wrapper.like(SysRole::getRoleName, roleName);
-        }
 
         roleMapper.selectPage(page, wrapper);
 
@@ -114,5 +112,13 @@ public class RoleServiceImpl implements RoleService {
             role.setEnabled(enabled);
             roleMapper.updateById(role);
         }
+    }
+
+    @Override
+    public List<RoleResponse> getAllEnabledRoles() {
+        LambdaQueryWrapper<SysRole> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(SysRole::getEnabled, 1);  // 只查询启用的角色
+        List<SysRole> roles = roleMapper.selectList(wrapper);
+        return roleConverter.toResponseList(roles);
     }
 }

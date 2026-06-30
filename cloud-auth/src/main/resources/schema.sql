@@ -40,15 +40,20 @@ CREATE TABLE IF NOT EXISTS sys_role (
 CREATE TABLE IF NOT EXISTS sys_permission (
     id           BIGINT          NOT NULL AUTO_INCREMENT,
     perm_code    VARCHAR(64)     NOT NULL COMMENT '权限编码，如 product:add 或 system-email:read',
-    perm_name    VARCHAR(64)     NOT NULL COMMENT '权限说明',
+    remark       VARCHAR(255)    DEFAULT NULL COMMENT '说明',
     service_code VARCHAR(64)     NOT NULL DEFAULT 'system' COMMENT '所属产品/服务',
+    type         TINYINT         NOT NULL DEFAULT 2 COMMENT '权限类型：1=目录/菜单，2=按钮/权限点',
+    parent_id    BIGINT          DEFAULT 0 COMMENT '父级权限ID，0表示根节点',
+    sort         INT             DEFAULT 0 COMMENT '排序字段，数值越小越靠前',
     create_time  DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     update_time  DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     created_by   VARCHAR(64)     DEFAULT NULL COMMENT '创建人',
     updated_by   VARCHAR(64)     DEFAULT NULL COMMENT '更新人',
     PRIMARY KEY (id),
     UNIQUE KEY uk_perm_code (perm_code),
-    KEY idx_service_code (service_code)
+    KEY idx_service_code (service_code),
+    KEY idx_parent_id (parent_id),
+    KEY idx_type (type)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT = '权限表';
 
 CREATE TABLE IF NOT EXISTS sys_user_role (
@@ -62,3 +67,26 @@ CREATE TABLE IF NOT EXISTS sys_role_permission (
     perm_id BIGINT NOT NULL,
     PRIMARY KEY (role_id, perm_id)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT = '角色-权限关联表';
+
+-- =====================================================
+-- 修改现有表结构（适用于表已存在的情况）
+-- 注意：MySQL 8.0.12+ 支持 ADD COLUMN IF NOT EXISTS
+--       低版本请手动执行去掉 IF NOT EXISTS 的语句
+-- =====================================================
+
+-- 为 sys_permission 表添加新字段（如果不存在）
+-- MySQL 8.0.12+ 版本：
+ALTER TABLE sys_permission
+    ADD COLUMN IF NOT EXISTS type TINYINT NOT NULL DEFAULT 2 COMMENT '权限类型：1=目录/菜单，2=按钮/权限点' AFTER service_code,
+    ADD COLUMN IF NOT EXISTS parent_id BIGINT DEFAULT 0 COMMENT '父级权限ID，0表示根节点' AFTER type,
+    ADD COLUMN IF NOT EXISTS sort INT DEFAULT 0 COMMENT '排序字段，数值越小越靠前' AFTER parent_id,
+    ADD INDEX IF NOT EXISTS idx_parent_id (parent_id),
+    ADD INDEX IF NOT EXISTS idx_type (type);
+
+-- MySQL 低版本兼容方案（请根据实际情况选择执行）：
+-- ALTER TABLE sys_permission
+--     ADD COLUMN type TINYINT NOT NULL DEFAULT 2 COMMENT '权限类型：1=目录/菜单，2=按钮/权限点' AFTER service_code,
+--     ADD COLUMN parent_id BIGINT DEFAULT 0 COMMENT '父级权限ID，0表示根节点' AFTER type,
+--     ADD COLUMN sort INT DEFAULT 0 COMMENT '排序字段，数值越小越靠前' AFTER parent_id,
+--     ADD INDEX idx_parent_id (parent_id),
+--     ADD INDEX idx_type (type);

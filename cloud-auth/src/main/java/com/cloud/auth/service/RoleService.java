@@ -36,9 +36,9 @@ public interface RoleService {
     RoleResponse getById(Long id);
 
     /**
-     * 分页查询角色（支持按角色名称筛选）
+     * 分页查询角色
      */
-    Page<RoleResponse> page(BasePage basePage, String roleName);
+    Page<RoleResponse> page(BasePage basePage);
 
     /**
      * 更新角色状态
@@ -49,4 +49,9 @@ public interface RoleService {
      * 批量更新角色状态
      */
     void batchUpdateStatus(java.util.List<Long> ids, Integer enabled);
+
+    /**
+     * 查询所有启用的角色
+     */
+    java.util.List<RoleResponse> getAllEnabledRoles();
 }

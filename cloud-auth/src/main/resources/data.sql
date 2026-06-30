@@ -9,7 +9,7 @@ INSERT IGNORE INTO sys_role (id, role_code, role_name, remark, enabled, created_
     (2, 'ROLE_USER',  '普通用户', '默认注册用户', 1, 'SYSTEM', 'SYSTEM');
 
 -- 权限（service_code 标识所属产品/服务）
-INSERT IGNORE INTO sys_permission (id, perm_code, perm_name, service_code, created_by, updated_by) VALUES
+INSERT IGNORE INTO sys_permission (id, perm_code, remark, service_code, created_by, updated_by) VALUES
     (1, 'product:query',  '产品查询', 'product', 'SYSTEM', 'SYSTEM'),
     (2, 'product:add',    '产品新增', 'product', 'SYSTEM', 'SYSTEM'),
     (3, 'product:update', '产品修改', 'product', 'SYSTEM', 'SYSTEM'),

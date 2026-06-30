@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cloud.auth.converter.UserConverter;
 import com.cloud.auth.dto.register.RegisterRequest;
+import com.cloud.auth.dto.user.UserInfoRequest;
 import com.cloud.auth.dto.user.UserRequest;
 import com.cloud.auth.dto.user.UserResponse;
 import com.cloud.auth.entity.SysPermission;
@@ -18,9 +19,9 @@ import com.cloud.common.result.ResultCode;
 import com.cloud.common.security.LoginUser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -34,7 +35,9 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
-    /** 默认注册角色：ROLE_USER (sys_role.id = 2) */
+    /**
+     * 默认注册角色：ROLE_USER (sys_role.id = 2)
+     */
     private static final Long DEFAULT_USER_ROLE_ID = 2L;
 
     private final SysUserMapper userMapper;
@@ -126,10 +129,11 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public UserResponse createUser(UserRequest request) {
         SysUser user = userConverter.toEntity(request);
-        // 创建时默认启用
-        if (user.getEnabled() == null) {
-            user.setEnabled(1);
+        user.setEnabled(1);
+        if (!StringUtils.hasText(user.getPassword())) {
+            request.setPassword("123456");
         }
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
         userMapper.insert(user);
         // 返回时不包含密码
         user.setPassword(null);
@@ -138,23 +142,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public UserResponse updateUser(Long id, UserRequest request) {
+    public UserResponse updateUser(Long id, UserInfoRequest request) {
         SysUser existing = userMapper.selectById(id);
         if (existing == null) {
             throw new RuntimeException("用户不存在");
         }
 
-        SysUser user = userConverter.toEntity(request);
+        SysUser user = userConverter.toEntityFromUserInfo(request);
         user.setId(id);
-
-        // 如果提供了新密码，则加密更新
-        if (request.getPassword() != null && !request.getPassword().trim().isEmpty()) {
-            user.setPassword(user.getPassword());
-        } else {
-            // 否则保持原密码
-            user.setPassword(existing.getPassword());
-        }
-
         userMapper.updateById(user);
 
         // 返回时不包含密码
@@ -225,5 +220,20 @@ public class UserServiceImpl implements UserService {
         user.setId(id);
         user.setEnabled(enabled);
         userMapper.updateById(user);
+    }
+
+    @Override
+    @Transactional
+    public void batchUpdateUserStatus(List<Long> ids, Integer enabled) {
+        if (ids == null || ids.isEmpty()) {
+            return;
+        }
+        // 使用MyBatis-Plus的批量更新功能
+        for (Long id : ids) {
+            SysUser user = new SysUser();
+            user.setId(id);
+            user.setEnabled(enabled);
+            userMapper.updateById(user);
+        }
     }
 }

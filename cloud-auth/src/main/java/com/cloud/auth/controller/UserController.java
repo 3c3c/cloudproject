@@ -1,6 +1,7 @@
 package com.cloud.auth.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.cloud.auth.dto.user.UserInfoRequest;
 import com.cloud.auth.dto.user.UserRequest;
 import com.cloud.auth.dto.user.UserResponse;
 import com.cloud.auth.service.UserService;
@@ -28,6 +29,7 @@ public class UserController {
      * @param keyword 用户名或手机号（可选）
      * @return 用户分页列表
      */
+    // @PreAuthorize("hasAuthority('user:query')")
     @GetMapping
     public Result<Page<UserResponse>> page(BasePage basePage,
             @RequestParam(required = false) String keyword) {
@@ -39,6 +41,7 @@ public class UserController {
      * @param request 用户创建请求
      * @return 创建的用户信息
      */
+    // @PreAuthorize("hasAuthority('user:update')")
     @PostMapping
     public Result<UserResponse> create(@Valid @RequestBody UserRequest request) {
         return Result.ok(userService.createUser(request));
@@ -50,8 +53,9 @@ public class UserController {
      * @param request 用户编辑请求
      * @return 编辑后的用户信息
      */
+    // @PreAuthorize("hasAuthority('user:update')")
     @PutMapping("/{id}")
-    public Result<UserResponse> update(@PathVariable Long id, @Valid @RequestBody UserRequest request) {
+    public Result<UserResponse> update(@PathVariable Long id, @Valid @RequestBody UserInfoRequest request) {
         return Result.ok(userService.updateUser(id, request));
     }
 
@@ -60,6 +64,7 @@ public class UserController {
      * @param id 用户ID
      * @return 删除结果
      */
+    // @PreAuthorize("hasAuthority('user:delete')")
     @DeleteMapping("/{id}")
     public Result<Void> delete(@PathVariable Long id) {
         userService.deleteUser(id);
@@ -71,6 +76,7 @@ public class UserController {
      * @param ids 用户ID列表
      * @return 删除结果
      */
+    // @PreAuthorize("hasAuthority('user:delete')")
     @DeleteMapping("/batch")
     public Result<Void> batchDelete(@RequestBody List<Long> ids) {
         userService.batchDeleteUsers(ids);
@@ -82,6 +88,7 @@ public class UserController {
      * @param id 用户ID
      * @return 用户信息
      */
+    // @PreAuthorize("hasAuthority('user:query')")
     @GetMapping("/{id}")
     public Result<UserResponse> getById(@PathVariable Long id) {
         return Result.ok(userService.getUserById(id));
@@ -93,9 +100,12 @@ public class UserController {
      * @param enabled 状态值（1启用 0禁用）
      * @return 更新结果
      */
+    // @PreAuthorize("hasAuthority('user:update')")
     @PutMapping("/{id}/status")
     public Result<Void> updateStatus(@PathVariable Long id, @RequestParam Integer enabled) {
         userService.updateUserStatus(id, enabled);
         return Result.ok();
     }
+
+
 }

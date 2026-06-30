@@ -10,7 +10,7 @@
     </select>
 
     <select id="selectPermissionsByUserId" resultType="com.cloud.auth.entity.SysPermission">
-        SELECT DISTINCT p.id, p.perm_code, p.perm_name, p.service_code
+        SELECT DISTINCT p.id, p.perm_code, p.remark, p.service_code
         FROM sys_permission p
         INNER JOIN sys_role_permission rp ON rp.perm_id = p.id
         INNER JOIN sys_user_role ur ON ur.role_id = rp.role_id

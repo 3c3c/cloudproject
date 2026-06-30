@@ -69,12 +69,12 @@ public class PermissionServiceImpl implements PermissionService {
     }
 
     @Override
-    public Page<PermissionResponse> page(BasePage basePage, String permName) {
+    public Page<PermissionResponse> page(BasePage basePage, String remark) {
         Page<SysPermission> page = new Page<>(basePage.getCurrent(), basePage.getSize());
         LambdaQueryWrapper<SysPermission> wrapper = new LambdaQueryWrapper<>();
 
-        if (permName != null && !permName.trim().isEmpty()) {
-            wrapper.like(SysPermission::getPermName, permName);
+        if (remark != null && !remark.trim().isEmpty()) {
+            wrapper.like(SysPermission::getRemark, remark);
         }
 
         permissionMapper.selectPage(page, wrapper);

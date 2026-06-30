@@ -36,9 +36,9 @@ public interface PermissionService {
     PermissionResponse getById(Long id);
 
     /**
-     * 分页查询权限（支持按权限名称筛选）
+     * 分页查询权限（支持按权限说明筛选）
      */
-    Page<PermissionResponse> page(BasePage basePage, String permName);
+    Page<PermissionResponse> page(BasePage basePage, String remark);
 
     /**
      * 按服务代码查询权限

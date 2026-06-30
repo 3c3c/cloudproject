@@ -2,6 +2,7 @@ package com.cloud.auth.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cloud.auth.dto.register.RegisterRequest;
+import com.cloud.auth.dto.user.UserInfoRequest;
 import com.cloud.auth.dto.user.UserRequest;
 import com.cloud.auth.dto.user.UserResponse;
 import com.cloud.auth.entity.SysUser;
@@ -33,7 +34,7 @@ public interface UserService {
     UserResponse createUser(UserRequest request);
 
     /** 编辑用户 */
-    UserResponse updateUser(Long id, UserRequest request);
+    UserResponse updateUser(Long id, UserInfoRequest request);
 
     /** 删除用户 */
     void deleteUser(Long id);
@@ -49,4 +50,7 @@ public interface UserService {
 
     /** 更新用户状态 */
     void updateUserStatus(Long id, Integer enabled);
+
+    /** 批量更新用户状态 */
+    void batchUpdateUserStatus(java.util.List<Long> ids, Integer enabled);
 }

@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * 权限响应DTO
@@ -16,8 +17,12 @@ public class PermissionResponse {
 
     private Long id;
     private String permCode;
-    private String permName;
+    private String remark;
     private String serviceCode;
+    private Integer type;       // 权限类型：1=目录/菜单，2=按钮/权限点
+    private Long parentId;      // 父级权限ID
+    private Integer sort;       // 排序字段
+    private List<PermissionResponse> children; // 子权限列表（用于树形结构）
     private LocalDateTime createTime;
     private LocalDateTime updateTime;
     private String createdBy;

@@ -14,10 +14,6 @@ public class RoleRequest {
     @Size(max = 50, message = "角色编码长度不能超过50个字符")
     private String roleCode;
 
-    @NotBlank(message = "角色名称不能为空")
-    @Size(max = 50, message = "角色名称长度不能超过50个字符")
-    private String roleName;
-
     @Size(max = 200, message = "备注长度不能超过200个字符")
     private String remark;
 

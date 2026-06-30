@@ -16,7 +16,6 @@ public class RoleResponse {
 
     private Long id;
     private String roleCode;
-    private String roleName;
     private String remark;
     private Integer enabled;
     private LocalDateTime createTime;

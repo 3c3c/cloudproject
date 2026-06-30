@@ -23,15 +23,16 @@ public class PermissionController {
     private final PermissionService permissionService;
 
     /**
-     * 根据权限名称分页查询全部权限列表功能
+     * 根据权限说明分页查询全部权限列表功能
      * @param basePage 分页参数
-     * @param permName 权限名称（可选）
+     * @param remark 权限说明（可选）
      * @return 权限分页列表
      */
+    // @PreAuthorize("hasAuthority('permission:query')")
     @GetMapping
     public Result<Page<PermissionResponse>> page(BasePage basePage,
-            @RequestParam(required = false) String permName) {
-        return Result.ok(permissionService.page(basePage, permName));
+            @RequestParam(required = false) String remark) {
+        return Result.ok(permissionService.page(basePage, remark));
     }
 
     /**
@@ -39,6 +40,7 @@ public class PermissionController {
      * @param request 权限创建请求
      * @return 创建的权限信息
      */
+    // @PreAuthorize("hasAuthority('permission:update')")
     @PostMapping
     public Result<PermissionResponse> create(@Valid @RequestBody PermissionRequest request) {
         return Result.ok(permissionService.create(request));
@@ -50,6 +52,7 @@ public class PermissionController {
      * @param request 权限编辑请求
      * @return 编辑后的权限信息
      */
+    // @PreAuthorize("hasAuthority('permission:update')")
     @PutMapping("/{id}")
     public Result<PermissionResponse> update(@PathVariable Long id, @Valid @RequestBody PermissionRequest request) {
         return Result.ok(permissionService.update(id, request));
@@ -60,6 +63,7 @@ public class PermissionController {
      * @param id 权限ID
      * @return 删除结果
      */
+    // @PreAuthorize("hasAuthority('permission:delete')")
     @DeleteMapping("/{id}")
     public Result<Void> delete(@PathVariable Long id) {
         permissionService.delete(id);
@@ -71,6 +75,7 @@ public class PermissionController {
      * @param ids 权限ID列表
      * @return 删除结果
      */
+    // @PreAuthorize("hasAuthority('permission:delete')")
     @DeleteMapping("/batch")
     public Result<Void> batchDelete(@RequestBody List<Long> ids) {
         permissionService.batchDelete(ids);
@@ -82,6 +87,7 @@ public class PermissionController {
      * @param id 权限ID
      * @return 权限信息
      */
+    // @PreAuthorize("hasAuthority('permission:query')")
     @GetMapping("/{id}")
     public Result<PermissionResponse> getById(@PathVariable Long id) {
         return Result.ok(permissionService.getById(id));
@@ -92,6 +98,7 @@ public class PermissionController {
      * @param serviceCode 服务代码
      * @return 权限列表
      */
+    // @PreAuthorize("hasAuthority('permission:query')")
     @GetMapping("/by-service/{serviceCode}")
     public Result<List<PermissionResponse>> getByServiceCode(@PathVariable String serviceCode) {
         return Result.ok(permissionService.getByServiceCode(serviceCode));
