@@ -10,11 +10,14 @@ import com.cloud.auth.entity.SysPermission;
 import com.cloud.auth.entity.SysRole;
 import com.cloud.auth.entity.SysUser;
 import com.cloud.auth.mapper.SysUserMapper;
+import com.cloud.auth.service.RSAService;
 import com.cloud.auth.service.UserService;
 import com.cloud.common.exception.BusinessException;
 import com.cloud.common.result.ResultCode;
 import com.cloud.common.security.LoginUser;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
@@ -25,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
@@ -34,6 +38,8 @@ public class UserServiceImpl implements UserService {
 
     private final SysUserMapper userMapper;
     private final UserConverter userConverter;
+    private final RSAService rsaService;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public LoginUser loadLoginUserByKeyword(String keyword) {
@@ -52,10 +58,22 @@ public class UserServiceImpl implements UserService {
         if (userMapper.selectByUsernameOrMobile(req.getUsername()) != null) {
             throw new BusinessException(ResultCode.BAD_REQUEST, "用户名已存在");
         }
+
+        // 使用RSA私钥解密前端传来的加密密码
+        String plainPassword;
+        try {
+            plainPassword = rsaService.decryptPassword(req.getPassword());
+            log.info("用户 [{}] 注册密码解密成功", req.getUsername());
+        } catch (Exception e) {
+            log.error("用户 [{}] 注册密码解密失败", req.getUsername(), e);
+            throw new BusinessException(ResultCode.BAD_REQUEST, "密码解密失败: " + e.getMessage());
+        }
+
         SysUser user = new SysUser();
         user.setUsername(req.getUsername());
         user.setNickname(req.getNickname());
-        user.setPassword(req.getPassword());
+        // 使用BCrypt加密密码后保存到数据库
+        user.setPassword(passwordEncoder.encode(plainPassword));
         user.setMobile(StringUtils.hasText(req.getMobile()) ? req.getMobile() : null);
         user.setEmail(req.getEmail());
         user.setEnabled(1);
