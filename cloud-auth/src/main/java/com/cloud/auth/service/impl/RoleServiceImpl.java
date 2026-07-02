@@ -81,9 +81,16 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    public Page<RoleResponse> page(BasePage basePage) {
+    public Page<RoleResponse> page(BasePage basePage, String keyword) {
         Page<SysRole> page = new Page<>(basePage.getCurrent(), basePage.getSize());
         LambdaQueryWrapper<SysRole> wrapper = new LambdaQueryWrapper<>();
+
+        // 如果提供了关键字，进行模糊搜索（匹配角色编码或角色说明）
+        if (StringUtils.hasText(keyword)) {
+            wrapper.and(w -> w.like(SysRole::getRoleCode, keyword)
+                    .or()
+                    .like(SysRole::getRemark, keyword));
+        }
 
         roleMapper.selectPage(page, wrapper);
 
@@ -127,7 +134,7 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    public List<RoleResponse> getRolesNotAssignedToUser(Long userId, String roleName) {
+    public List<RoleResponse> getRolesNotAssignedToUser(Long userId, String keyword) {
         // 1. 查询该用户已拥有的角色 ID 列表
         List<com.cloud.auth.entity.SysRole> userRoles = userMapper.selectRolesByUserId(userId);
         List<Long> userRoleIds = userRoles.stream()
@@ -143,15 +150,49 @@ public class RoleServiceImpl implements RoleService {
             wrapper.notIn(SysRole::getId, userRoleIds);
         }
 
-        // 如果提供了角色名称，进行模糊搜索
-        if (StringUtils.hasText(roleName)) {
-            wrapper.like(SysRole::getRoleName, roleName);
+        // 如果提供了关键字，进行模糊搜索（匹配角色编码或角色说明）
+        if (StringUtils.hasText(keyword)) {
+            wrapper.and(w -> w.like(SysRole::getRoleCode, keyword)
+                    .or()
+                    .like(SysRole::getRemark, keyword));
         }
 
-        // 3. 按角色名称排序
-        wrapper.orderByAsc(SysRole::getRoleName);
+        // 3. 按角色编码排序
+        wrapper.orderByAsc(SysRole::getRoleCode);
 
         List<SysRole> roles = roleMapper.selectList(wrapper);
         return roleConverter.toResponseList(roles);
+    }
+
+    @Override
+    public List<RoleResponse> getRolesByUserId(Long userId, String keyword) {
+        // 1. 查询用户拥有的所有角色
+        List<SysRole> userRoles = userMapper.selectRolesByUserId(userId);
+
+        // 2. 如果提供了关键字，进行过滤
+        if (userRoles != null && !userRoles.isEmpty() && StringUtils.hasText(keyword)) {
+            return userRoles.stream()
+                    .filter(role -> {
+                        // 角色编码或角色说明模糊匹配（OR 关系）
+                        boolean codeMatch = role.getRoleCode() != null &&
+                                role.getRoleCode().toLowerCase().contains(keyword.toLowerCase());
+                        boolean remarkMatch = role.getRemark() != null &&
+                                role.getRemark().toLowerCase().contains(keyword.toLowerCase());
+                        return codeMatch || remarkMatch;
+                    })
+                    .map(roleConverter::toResponse)
+                    .collect(Collectors.toList());
+        }
+
+        return roleConverter.toResponseList(userRoles);
+    }
+
+    @Override
+    @Transactional
+    public void removeUserRoles(Long userId, List<Long> roleIds) {
+        if (roleIds == null || roleIds.isEmpty()) {
+            return;
+        }
+        userMapper.deleteUserRolesByRoleIds(userId, roleIds);
     }
 }

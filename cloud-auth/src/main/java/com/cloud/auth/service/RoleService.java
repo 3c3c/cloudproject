@@ -36,9 +36,12 @@ public interface RoleService {
     RoleResponse getById(Long id);
 
     /**
-     * 分页查询角色
+     * 分页查询角色，支持根据关键字（角色编码或角色说明）模糊搜索
+     * @param basePage 分页参数
+     * @param keyword 关键字（可选，可匹配角色编码或角色说明）
+     * @return 角色分页列表
      */
-    Page<RoleResponse> page(BasePage basePage);
+    Page<RoleResponse> page(BasePage basePage, String keyword);
 
     /**
      * 更新角色状态
@@ -56,10 +59,25 @@ public interface RoleService {
     java.util.List<RoleResponse> getAllEnabledRoles();
 
     /**
-     * 根据用户查询当前用户还没拥有的所有角色，可以根据角色名称搜索
+     * 根据用户查询当前用户还没拥有的所有角色，支持根据关键字（角色编码或角色说明）模糊搜索
      * @param userId 用户ID
-     * @param roleName 角色名称（可选，支持模糊搜索）
+     * @param keyword 关键字（可选，可匹配角色编码或角色说明）
      * @return 用户未拥有的角色列表
      */
-    java.util.List<RoleResponse> getRolesNotAssignedToUser(Long userId, String roleName);
+    java.util.List<RoleResponse> getRolesNotAssignedToUser(Long userId, String keyword);
+
+    /**
+     * 根据用户ID查询当前用户拥有的所有角色，支持根据关键字（角色编码或角色说明）模糊搜索
+     * @param userId 用户ID
+     * @param keyword 关键字（可选，可匹配角色编码或角色说明）
+     * @return 用户拥有的角色列表
+     */
+    java.util.List<RoleResponse> getRolesByUserId(Long userId, String keyword);
+
+    /**
+     * 根据用户ID和角色ID列表批量删除用户角色
+     * @param userId 用户ID
+     * @param roleIds 角色ID列表
+     */
+    void removeUserRoles(Long userId, java.util.List<Long> roleIds);
 }

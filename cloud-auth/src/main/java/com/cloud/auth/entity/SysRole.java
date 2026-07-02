@@ -14,8 +14,7 @@ public class SysRole extends BaseEntity {
     private Long id;
 
     private String roleCode;    // 角色编码
-    private String roleName;    // 角色名称
-    private String remark;      // 说明
+    private String remark;      // 角色说明（原roleName）
     private Integer enabled;    // 状态：1 启用 0 禁用
 
     @TableLogic

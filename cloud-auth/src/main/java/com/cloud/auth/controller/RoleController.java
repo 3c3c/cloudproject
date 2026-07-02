@@ -24,14 +24,17 @@ public class RoleController {
     private final RoleService roleService;
 
     /**
-     * 分页查询所有角色的功能
+     * 分页查询所有角色的功能，支持根据关键字（角色编码或角色说明）模糊搜索
      * @param basePage 分页参数
+     * @param keyword 关键字（可选，可匹配角色编码或角色说明）
      * @return 角色分页列表
      */
     // @PreAuthorize("hasAuthority('role:query')")
     @GetMapping
-    public Result<Page<RoleResponse>> page(BasePage basePage) {
-        return Result.ok(roleService.page(basePage));
+    public Result<Page<RoleResponse>> page(
+            BasePage basePage,
+            @RequestParam(required = false) String keyword) {
+        return Result.ok(roleService.page(basePage, keyword));
     }
 
     /**
@@ -127,22 +130,36 @@ public class RoleController {
         return Result.ok(true);
     }
 
-    //
-
 
     /**
-     * 根据用户查询当前用户还没拥有的所有角色，可以根据角色名称搜索
+     * 根据用户Id查询当前用户拥有的所有角色，支持根据关键字（角色编码或角色说明）模糊搜索
      * @param userId 用户ID
-     * @param roleName 角色名称（可选，支持模糊搜索）
+     * @param keyword 关键字（可选，可匹配角色编码或角色说明）
+     * @return 用户拥有的角色列表
+     */
+    // @PreAuthorize("hasAuthority('role:query')")
+    @GetMapping("/user/{userId}")
+    public Result<List<RoleResponse>> getRolesByUserId(
+            @PathVariable Long userId,
+            @RequestParam(required = false) String keyword) {
+        return Result.ok(roleService.getRolesByUserId(userId, keyword));
+    }
+
+    /**
+     * 根据用户查询当前用户还没拥有的所有角色，支持根据关键字（角色编码或角色说明）模糊搜索
+     * @param userId 用户ID
+     * @param keyword 关键字（可选，可匹配角色编码或角色说明）
      * @return 用户未拥有的角色列表
      */
     // @PreAuthorize("hasAuthority('role:query')")
     @GetMapping("/not-assigned")
     public Result<List<RoleResponse>> getRolesNotAssignedToUser(
             @RequestParam Long userId,
-            @RequestParam(required = false) String roleName) {
-        return Result.ok(roleService.getRolesNotAssignedToUser(userId, roleName));
+            @RequestParam(required = false) String keyword) {
+        return Result.ok(roleService.getRolesNotAssignedToUser(userId, keyword));
     }
+
+
 
 
 

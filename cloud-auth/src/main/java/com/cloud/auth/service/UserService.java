@@ -47,7 +47,7 @@ public interface UserService {
     /** 根据ID查询用户 */
     UserResponse getUserById(Long id);
 
-    /** 分页查询用户（支持按用户名或手机号筛选） */
+    /** 分页查询用户（支持按用户账号或用户名称筛选） */
     Page<UserResponse> pageUsers(BasePage basePage, String keyword);
 
     /** 更新用户状态 */
@@ -55,4 +55,10 @@ public interface UserService {
 
     /** 批量更新用户状态 */
     void batchUpdateUserStatus(List<Long> ids, Integer enabled);
+
+    /** 为用户分配角色（覆盖式：以传入的角色列表为准，一个用户可绑定多个角色） */
+    void assignUserRoles(Long userId, List<Long> roleIds);
+
+    /** 根据用户ID和角色ID列表批量删除用户角色 */
+    void removeUserRoles(Long userId, List<Long> roleIds);
 }

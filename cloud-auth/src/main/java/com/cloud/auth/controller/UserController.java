@@ -5,6 +5,7 @@ import com.cloud.auth.dto.user.BatchUpdateUserStatusRequest;
 import com.cloud.auth.dto.user.UserInfoRequest;
 import com.cloud.auth.dto.user.UserRequest;
 import com.cloud.auth.dto.user.UserResponse;
+import com.cloud.auth.dto.user.UserRoleBindRequest;
 import com.cloud.auth.service.UserService;
 import com.cloud.common.entity.BasePage;
 import com.cloud.common.result.Result;
@@ -27,7 +28,7 @@ public class UserController {
     /**
      * 根据用户名称或者账号，分页查询用户列表的功能，列表上有用户账号、用户名称、用户状态
      * @param basePage 分页参数
-     * @param keyword 用户名或手机号（可选）
+     * @param keyword 用户名称或者用户账号
      * @return 用户分页列表
      */
     // @PreAuthorize("hasAuthority('user:query')")
@@ -119,6 +120,32 @@ public class UserController {
         userService.batchUpdateUserStatus(request.getUserIds(), request.getEnabled());
         return Result.ok(true);
     }
+
+    /**
+     * 用户绑定角色功能（一个用户Id可以绑定多个角色Id，覆盖式分配）
+     * @param request 角色绑定请求（userId 指定用户，roleIds 为该用户的最终角色列表，覆盖原有绑定；为空表示解除全部角色绑定）
+     * @return 绑定结果
+     */
+    // @PreAuthorize("hasAuthority('user:update')")
+    @PutMapping("/roles")
+    public Result<Boolean> assignRoles(@Valid @RequestBody UserRoleBindRequest request) {
+        userService.assignUserRoles(request.getUserId(), request.getRoleIds());
+        return Result.ok(true);
+    }
+
+    /**
+     * 根据用户Id，角色Id列表批量删除一个用户拥有的角色
+     * @param userId 用户ID
+     * @param roleIds 角色ID列表
+     * @return 删除结果
+     */
+    // @PreAuthorize("hasAuthority('user:update')")
+    @DeleteMapping("/{userId}/roles")
+    public Result<Boolean> removeUserRoles(@PathVariable Long userId, @RequestBody List<Long> roleIds) {
+        userService.removeUserRoles(userId, roleIds);
+        return Result.ok(true);
+    }
+
 
 
 }

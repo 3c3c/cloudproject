@@ -192,10 +192,10 @@ public class UserServiceImpl implements UserService {
         LambdaQueryWrapper<SysUser> wrapper = new LambdaQueryWrapper<>();
 
         if (keyword != null && !keyword.trim().isEmpty()) {
-            // 支持按用户名或手机号查询
+            // 支持按用户账号或用户名称查询
             wrapper.and(w -> w.like(SysUser::getUsername, keyword)
                     .or()
-                    .like(SysUser::getMobile, keyword));
+                    .like(SysUser::getNickname, keyword));
         }
 
         userMapper.selectPage(page, wrapper);
@@ -235,5 +235,31 @@ public class UserServiceImpl implements UserService {
             user.setEnabled(enabled);
             userMapper.updateById(user);
         }
+    }
+
+    @Override
+    @Transactional
+    public void assignUserRoles(Long userId, List<Long> roleIds) {
+        SysUser existing = userMapper.selectById(userId);
+        if (existing == null) {
+            throw new BusinessException(ResultCode.BAD_REQUEST, "用户不存在");
+        }
+        if (roleIds != null && !roleIds.isEmpty()) {
+            userMapper.bindRoles(userId, roleIds);
+        }
+    }
+
+    @Override
+    @Transactional
+    public void removeUserRoles(Long userId, List<Long> roleIds) {
+        if (roleIds == null || roleIds.isEmpty()) {
+            return;
+        }
+        SysUser existing = userMapper.selectById(userId);
+        if (existing == null) {
+            throw new BusinessException(ResultCode.BAD_REQUEST, "用户不存在");
+        }
+        // 批量删除指定的用户角色绑定关系
+        userMapper.deleteUserRolesByRoleIds(userId, roleIds);
     }
 }

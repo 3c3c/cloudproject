@@ -30,6 +30,15 @@ public interface SysUserMapper extends BaseMapper<SysUser> {
     @Insert("INSERT IGNORE INTO sys_user_role(user_id, role_id) VALUES(#{userId}, #{roleId})")
     int bindRole(@Param("userId") Long userId, @Param("roleId") Long roleId);
 
+    /** 批量绑定用户角色（分配角色时使用，INSERT IGNORE 保证幂等，忽略重复绑定） */
+    @Insert("<script>" +
+            "INSERT IGNORE INTO sys_user_role(user_id, role_id) VALUES " +
+            "<foreach item='roleId' collection='roleIds' open='' separator=',' close=''>" +
+            "(#{userId}, #{roleId})" +
+            "</foreach>" +
+            "</script>")
+    int bindRoles(@Param("userId") Long userId, @Param("roleIds") List<Long> roleIds);
+
     /** 删除用户角色绑定关系（删除用户时同步删除） */
     @Delete("DELETE FROM sys_user_role WHERE user_id = #{userId}")
     int deleteUserRoles(@Param("userId") Long userId);
@@ -42,4 +51,13 @@ public interface SysUserMapper extends BaseMapper<SysUser> {
             "</foreach>" +
             "</script>")
     int batchDeleteUserRoles(@Param("userIds") List<Long> userIds);
+
+    /** 根据用户ID和角色ID列表批量删除用户角色绑定关系 */
+    @Delete("<script>" +
+            "DELETE FROM sys_user_role WHERE user_id = #{userId} AND role_id IN " +
+            "<foreach item='item' index='index' collection='roleIds' open='(' separator=',' close=')'>" +
+            "#{item}" +
+            "</foreach>" +
+            "</script>")
+    int deleteUserRolesByRoleIds(@Param("userId") Long userId, @Param("roleIds") List<Long> roleIds);
 }
