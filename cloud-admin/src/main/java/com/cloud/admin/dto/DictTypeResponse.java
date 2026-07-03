@@ -4,24 +4,20 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-
 /**
- * 字典响应DTO
+ * 字典类型响应DTO（支持树形结构）
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class DictResponse {
+public class DictTypeResponse {
 
     private Long id;
-    private String dictCode;
     private String dictName;
-    private String dictType;
+    private String dictCode;
+    private Long parentId;
     private Integer sortOrder;
+    private Integer status;
     private String remark;
-    private LocalDateTime createTime;
-    private LocalDateTime updateTime;
-    private String createdBy;
-    private String updatedBy;
+    private Boolean isLeaf;
 }

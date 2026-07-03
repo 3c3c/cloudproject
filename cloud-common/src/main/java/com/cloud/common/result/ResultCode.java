@@ -22,7 +22,17 @@ public enum ResultCode {
     TOKEN_KICKED(1005, "Token 已失效或在别处登录"),
     SMS_CODE_ERROR(1006, "验证码错误或已过期"),
     SMS_CODE_RATE_LIMIT(1007, "验证码发送过于频繁"),
-    FORBIDDEN_OPERATION(1008, "无权执行该操作");
+    FORBIDDEN_OPERATION(1008, "无权执行该操作"),
+
+    // 字典管理相关错误码 (2000-2099)
+    DICT_TYPE_CODE_EXISTS(2001, "字典类型编码已存在"),
+    DICT_TYPE_NOT_FOUND(2002, "字典类型不存在"),
+    DICT_TYPE_PARENT_NOT_FOUND(2003, "父节点不存在"),
+    DICT_TYPE_CIRCULAR_REFERENCE(2004, "不能将节点设置为自己的子孙节点的子节点"),
+    DICT_TYPE_SELF_PARENT(2005, "不能将节点设置为自己的父节点"),
+    DICT_TYPE_INVALID_STATUS(2006, "状态值无效，只能是0（禁用）或1（启用）"),
+    DICT_DATA_NOT_FOUND(2007, "字典数据不存在"),
+    DICT_TYPE_CODE_REQUIRED(2008, "字典类型编码不能为空");
 
     private final int code;
     private final String message;

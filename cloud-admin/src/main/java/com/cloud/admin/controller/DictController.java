@@ -1,107 +1,192 @@
 package com.cloud.admin.controller;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.cloud.admin.dto.DictRequest;
-import com.cloud.admin.dto.DictResponse;
-import com.cloud.admin.service.DictService;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.cloud.admin.dto.*;
+import com.cloud.admin.service.DictDataService;
+import com.cloud.admin.service.DictTypeService;
 import com.cloud.common.entity.BasePage;
 import com.cloud.common.result.Result;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 /**
- * 字典管理接口：增删改查、按类型查询
+ * 字典管理统一接口：包含字典类型和字典数据的增删改查
  */
 @RestController
-@RequestMapping("/dicts")
+@RequestMapping("/admin/dict")
 @RequiredArgsConstructor
 public class DictController {
 
-    private final DictService dictService;
+    private final DictTypeService dictTypeService;
+    private final DictDataService dictDataService;
+
 
     /**
-     * 根据字典名称分页查询全部字典列表功能
-     * @param basePage 分页参数
-     * @param dictName 字典名称（可选）
-     * @return 字典分页列表
+     * 查询所有字典类型列表
+     *
+     * @return 字典类型列表
      */
-    @PreAuthorize("hasAuthority('dict:query')")
-    @GetMapping
-    public Result<Page<DictResponse>> page(BasePage basePage,
-            @RequestParam(required = false) String dictName) {
-        return Result.ok(dictService.page(basePage, dictName));
+//    @PreAuthorize("hasAuthority('dict:query')")
+    @GetMapping("/types/all")
+    public Result<List<DictTypeResponse>> listAllTypes() {
+        return Result.ok(dictTypeService.listAll());
     }
 
     /**
-     * 添加字典功能
-     * @param request 字典创建请求
-     * @return 创建的字典信息
+     * 创建字典类型
+     *
+     * @param request 字典类型创建请求
+     * @return 创建的字典类型信息
      */
-    @PreAuthorize("hasAuthority('dict:update')")
-    @PostMapping
-    public Result<DictResponse> create(@Valid @RequestBody DictRequest request) {
-        return Result.ok(dictService.create(request));
+//    @PreAuthorize("hasAuthority('dict:update')")
+    @PostMapping("/types")
+    public Result<DictTypeResponse> createType(@Valid @RequestBody DictTypeRequest request) {
+        return Result.ok(dictTypeService.create(request));
     }
 
     /**
-     * 编辑字典功能
-     * @param id 字典ID
-     * @param request 字典编辑请求
-     * @return 编辑后的字典信息
+     * 更新字典类型
+     *
+     * @param id      字典类型ID
+     * @param request 字典类型更新请求
+     * @return 更新后的字典类型信息
      */
-    @PreAuthorize("hasAuthority('dict:update')")
-    @PutMapping("/{id}")
-    public Result<DictResponse> update(@PathVariable Long id, @Valid @RequestBody DictRequest request) {
-        return Result.ok(dictService.update(id, request));
+//    @PreAuthorize("hasAuthority('dict:update')")
+    @PutMapping("/types/{id}")
+    public Result<DictTypeResponse> updateType(@PathVariable Long id,
+                                                 @Valid @RequestBody DictTypeRequest request) {
+        return Result.ok(dictTypeService.update(id, request));
     }
 
     /**
-     * 删除字典功能
-     * @param id 字典ID
+     * 批量删除字典类型
+     *
+     * @param ids 字典类型ID列表
      * @return 删除结果
      */
-    @PreAuthorize("hasAuthority('dict:delete')")
-    @DeleteMapping("/{id}")
-    public Result<Void> delete(@PathVariable Long id) {
-        dictService.delete(id);
+//    @PreAuthorize("hasAuthority('dict:delete')")
+    @DeleteMapping("/types/batch")
+    public Result<Void> batchDeleteTypes(@RequestBody List<Long> ids) {
+        dictTypeService.batchDelete(ids);
         return Result.ok();
     }
 
     /**
-     * 批量删除字典功能
-     * @param ids 字典ID列表
+     * 根据字典类型编码查询
+     *
+     * @param dictCode 字典类型编码
+     * @return 字典类型信息
+     */
+//    @PreAuthorize("hasAuthority('dict:query')")
+    @GetMapping("/types/by-code/{dictCode}")
+    public Result<DictTypeResponse> searchType(@PathVariable String dictCode) {
+        return Result.ok(dictTypeService.getByCode(dictCode));
+    }
+
+    /**
+     * 根据多个字典类型编码批量查询
+     *
+     * @param dictCodes 字典类型编码列表
+     * @return 字典类型列表
+     */
+//    @PreAuthorize("hasAuthority('dict:query')")
+    @PostMapping("/types/by-codes")
+    public Result<List<DictTypeResponse>> searchTypesByCodes(@RequestBody List<String> dictCodes) {
+        return Result.ok(dictTypeService.getByCodes(dictCodes));
+    }
+
+    /**
+     * 查询字典类型树形结构
+     *
+     * @return 字典类型树
+     */
+//    @PreAuthorize("hasAuthority('dict:query')")
+    @GetMapping("/types/tree")
+    public Result<List<DictTypeTreeResponse>> getTypeTree() {
+        return Result.ok(dictTypeService.getTree());
+    }
+
+    /**
+     * 更新字典类型状态功能
+     * @param id 字典类型ID
+     * @param status 状态值（1启用 0禁用）
+     * @return 更新结果
+     */
+//    @PreAuthorize("hasAuthority('dict:update')")
+    @PutMapping("/types/{id}/status")
+    public Result<Boolean> updateTypeStatus(@PathVariable Long id, @RequestParam Integer status) {
+        dictTypeService.updateStatus(id, status);
+        return Result.ok(true);
+    }
+
+
+    // ==================== 字典数据接口 ====================
+
+    /**
+     * 分页查询字典数据列表
+     *
+     * @param basePage   分页参数
+     * @param dictTypeId 字典类型ID（可选）
+     * @return 字典数据分页列表
+     */
+//    @PreAuthorize("hasAuthority('dict:query')")
+    @GetMapping("/data")
+    public Result<IPage<DictDataResponse>> pageData(BasePage basePage,
+                                                    @RequestParam(required = false) Long dictTypeId) {
+        return Result.ok(dictDataService.page(basePage, dictTypeId));
+    }
+
+    /**
+     * 根据字典类型编码查询字典数据列表
+     *
+     * @param dictCode 字典类型编码
+     * @return 字典数据列表
+     */
+//    @PreAuthorize("hasAuthority('dict:query')")
+    @GetMapping("/data/by-code/{dictCode}")
+    public Result<List<DictDataResponse>> listDataByCode(@PathVariable String dictCode) {
+        return Result.ok(dictDataService.listByDictCode(dictCode));
+    }
+
+    /**
+     * 创建字典数据
+     *
+     * @param request 字典数据创建请求
+     * @return 创建的字典数据信息
+     */
+//    @PreAuthorize("hasAuthority('dict:update')")
+    @PostMapping("/data")
+    public Result<DictDataResponse> createData(@Valid @RequestBody DictDataRequest request) {
+        return Result.ok(dictDataService.create(request));
+    }
+
+    /**
+     * 更新字典数据
+     *
+     * @param id      字典数据ID
+     * @param request 字典数据更新请求
+     * @return 更新后的字典数据信息
+     */
+//    @PreAuthorize("hasAuthority('dict:update')")
+    @PutMapping("/data/{id}")
+    public Result<DictDataResponse> updateData(@PathVariable Long id,
+                                                @Valid @RequestBody DictDataRequest request) {
+        return Result.ok(dictDataService.update(id, request));
+    }
+
+    /**
+     * 批量删除字典数据
+     *
+     * @param ids 字典数据ID列表
      * @return 删除结果
      */
-    @PreAuthorize("hasAuthority('dict:delete')")
-    @DeleteMapping("/batch")
-    public Result<Void> batchDelete(@RequestBody List<Long> ids) {
-        dictService.batchDelete(ids);
+//    @PreAuthorize("hasAuthority('dict:delete')")
+    @DeleteMapping("/data/batch")
+    public Result<Void> batchDeleteData(@RequestBody List<Long> ids) {
+        dictDataService.batchDelete(ids);
         return Result.ok();
-    }
-
-    /**
-     * 根据ID查询字典功能
-     * @param id 字典ID
-     * @return 字典信息
-     */
-    @PreAuthorize("hasAuthority('dict:query')")
-    @GetMapping("/{id}")
-    public Result<DictResponse> getById(@PathVariable Long id) {
-        return Result.ok(dictService.getById(id));
-    }
-
-    /**
-     * 按字典类型查询字典列表功能
-     * @param dictType 字典类型
-     * @return 字典列表
-     */
-    @PreAuthorize("hasAuthority('dict:query')")
-    @GetMapping("/by-type/{dictType}")
-    public Result<List<DictResponse>> getByDictType(@PathVariable String dictType) {
-        return Result.ok(dictService.getByDictType(dictType));
     }
 }

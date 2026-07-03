@@ -8,30 +8,31 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
- * 系统字典表实体
+ * 字典数据表实体
+ * 用于存储具体字典项，如：性别下的"男"、"女"，学历下的"本科"、"硕士"等
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-@TableName("sys_dict")
-public class SysDict extends BaseEntity {
+@TableName("sys_dict_data")
+public class SysDictData extends BaseEntity {
 
     @TableId(type = IdType.AUTO)
     private Long id;
 
     /**
-     * 字典编码，如 gender, education_level
+     * 字典类型ID，关联sys_dict_type表
      */
-    private String dictCode;
+    private Long dictTypeId;
 
     /**
-     * 字典名称，如 性别、学历
+     * 字典标签（显示值），如：男、女、本科、硕士
      */
-    private String dictName;
+    private String dictLabel;
 
     /**
-     * 字典类型，如 system, business
+     * 字典值（实际值），如：1、2、bachelor、master
      */
-    private String dictType;
+    private String dictValue;
 
     /**
      * 排序号
