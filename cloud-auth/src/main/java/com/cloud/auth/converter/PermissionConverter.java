@@ -4,6 +4,7 @@ import com.cloud.auth.dto.permission.PermissionRequest;
 import com.cloud.auth.dto.permission.PermissionResponse;
 import com.cloud.auth.entity.SysPermission;
 import org.mapstruct.Mapper;
+import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 
 import java.util.List;
@@ -21,6 +22,11 @@ public interface PermissionConverter {
      * Request DTO转Entity
      */
     SysPermission toEntity(PermissionRequest request);
+
+    /**
+     * 更新Entity
+     */
+    void updateEntity(PermissionRequest request, @MappingTarget SysPermission entity);
 
     /**
      * Entity转Response DTO

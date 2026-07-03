@@ -32,7 +32,19 @@ public enum ResultCode {
     DICT_TYPE_SELF_PARENT(2005, "不能将节点设置为自己的父节点"),
     DICT_TYPE_INVALID_STATUS(2006, "状态值无效，只能是0（禁用）或1（启用）"),
     DICT_DATA_NOT_FOUND(2007, "字典数据不存在"),
-    DICT_TYPE_CODE_REQUIRED(2008, "字典类型编码不能为空");
+    DICT_TYPE_CODE_REQUIRED(2008, "字典类型编码不能为空"),
+
+    // 权限管理相关错误码 (2100-2199)
+    PERMISSION_CODE_EXISTS(2101, "权限码已存在"),
+    PERMISSION_NOT_FOUND(2102, "权限不存在"),
+    PERMISSION_PARENT_NOT_FOUND(2103, "父级权限不存在"),
+    PERMISSION_CIRCULAR_REFERENCE(2104, "不能将权限设置为自己的子孙权限的子权限"),
+    PERMISSION_SELF_PARENT(2105, "不能将权限设置为自己的父权限"),
+    PERMISSION_INVALID_STATUS(2106, "状态值无效，只能是0（禁用）或1（启用）"),
+    PERMISSION_HAS_CHILDREN(2107, "该权限下有子权限，请先删除子权限"),
+    PERMISSION_INVALID_TYPE(2108, "权限类型无效"),
+    PERMISSION_PARENT_TYPE_INVALID(2109, "父级权限类型无效"),
+    PERMISSION_ASSIGNED_TO_ROLE(2110, "该权限已分配给角色，无法删除");
 
     private final int code;
     private final String message;

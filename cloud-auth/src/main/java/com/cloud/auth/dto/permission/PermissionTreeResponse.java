@@ -1,25 +1,27 @@
-package com.cloud.auth.entity;
+package com.cloud.auth.dto.permission;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.cloud.common.entity.BaseEntity;
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
+/**
+ * 权限树形响应DTO
+ */
 @Data
-@EqualsAndHashCode(callSuper = true)
-@TableName("sys_permission")
-public class SysPermission extends BaseEntity {
+@NoArgsConstructor
+@AllArgsConstructor
+public class PermissionTreeResponse {
 
     /**
      * 主键ID
      */
-    @TableId(type = IdType.ASSIGN_ID)
     private Long id;
 
     /**
-     * 权限码，格式如：product:add
+     * 权限码
      */
     private String permCode;
 
@@ -34,7 +36,7 @@ public class SysPermission extends BaseEntity {
     private Integer type;
 
     /**
-     * 父级ID，0或null表示根节点
+     * 父级ID
      */
     private Long parentId;
 
@@ -54,12 +56,12 @@ public class SysPermission extends BaseEntity {
     private String component;
 
     /**
-     * 是否可见：0=隐藏，1=显示 为什么需要这个字段
+     * 是否可见：0=隐藏，1=显示
      */
     private Integer visible;
 
     /**
-     * 所属产品/服务，如：product、order、system
+     * 所属产品/服务
      */
     private String serviceCode;
 
@@ -69,7 +71,7 @@ public class SysPermission extends BaseEntity {
     private Integer enabled;
 
     /**
-     * 排序字段，数值越小越靠前
+     * 排序字段
      */
     private Integer sort;
 
@@ -77,4 +79,9 @@ public class SysPermission extends BaseEntity {
      * 说明
      */
     private String remark;
+
+    /**
+     * 子节点列表
+     */
+    private List<PermissionTreeResponse> children;
 }
