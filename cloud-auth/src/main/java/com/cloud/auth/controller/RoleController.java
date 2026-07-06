@@ -2,6 +2,7 @@ package com.cloud.auth.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cloud.auth.dto.permission.PermissionTreeWithAssignedResponse;
+import com.cloud.auth.dto.role.AssignPermissionsRequest;
 import com.cloud.auth.dto.role.BatchUpdateStatusRequest;
 import com.cloud.auth.dto.role.RoleRequest;
 import com.cloud.auth.dto.role.RoleResponse;
@@ -131,35 +132,6 @@ public class RoleController {
         return Result.ok(true);
     }
 
-
-    /**
-     * 根据用户Id查询当前用户拥有的所有角色，支持根据关键字（角色编码或角色说明）模糊搜索
-     * @param userId 用户ID
-     * @param keyword 关键字（可选，可匹配角色编码或角色说明）
-     * @return 用户拥有的角色列表
-     */
-    // @PreAuthorize("hasAuthority('role:query')")
-    @GetMapping("/user/{userId}")
-    public Result<List<RoleResponse>> getRolesByUserId(
-            @PathVariable Long userId,
-            @RequestParam(required = false) String keyword) {
-        return Result.ok(roleService.getRolesByUserId(userId, keyword));
-    }
-
-    /**
-     * 根据用户查询当前用户还没拥有的所有角色，支持根据关键字（角色编码或角色说明）模糊搜索
-     * @param userId 用户ID
-     * @param keyword 关键字（可选，可匹配角色编码或角色说明）
-     * @return 用户未拥有的角色列表
-     */
-    // @PreAuthorize("hasAuthority('role:query')")
-    @GetMapping("/not-assigned")
-    public Result<List<RoleResponse>> getRolesNotAssignedToUser(
-            @RequestParam Long userId,
-            @RequestParam(required = false) String keyword) {
-        return Result.ok(roleService.getRolesNotAssignedToUser(userId, keyword));
-    }
-
     /**
      * 根据角色ID查询所有权限树，并标注角色是否拥有该权限
      * @param roleId 角色ID
@@ -172,4 +144,20 @@ public class RoleController {
         return Result.ok(roleService.getPermissionTreeByRole(roleId));
 
     }
+
+    /**
+     * 为角色分配多个权限
+     * @param roleId 角色ID
+     * @param request 权限分配请求
+     * @return 操作结果
+     */
+    // @PreAuthorize("hasAuthority('role:update')")
+    @PostMapping("/{roleId}/permissions")
+    public Result<Void> assignPermissions(
+            @PathVariable Long roleId,
+            @Valid @RequestBody AssignPermissionsRequest request) {
+        roleService.assignPermissions(roleId, request.getPermissionIds());
+        return Result.ok();
+    }
+
 }

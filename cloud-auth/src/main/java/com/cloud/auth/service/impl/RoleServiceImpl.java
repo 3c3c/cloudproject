@@ -68,17 +68,26 @@ public class RoleServiceImpl implements RoleService {
     @Override
     @Transactional
     public void delete(Long id) {
-        // MyBatis Plus的逻辑删除会自动将deleted字段设置为1
+        // 1. 先删除角色与权限的绑定关系
+        rolePermissionMapper.deleteAllByRoleId(id);
+
+        // 2. MyBatis Plus的逻辑删除会自动将deleted字段设置为1
         roleMapper.deleteById(id);
     }
 
     @Override
     @Transactional
-    public void batchDelete(java.util.List<Long> ids) {
+    public void batchDelete(List<Long> ids) {
         if (ids == null || ids.isEmpty()) {
             return;
         }
-        // 使用MyBatis Plus的批量删除方法（支持逻辑删除）
+
+        // 1. 先删除所有角色与权限的绑定关系
+        for (Long roleId : ids) {
+            rolePermissionMapper.deleteAllByRoleId(roleId);
+        }
+
+        // 2. 使用MyBatis Plus的批量删除方法（支持逻辑删除）
         roleMapper.deleteBatchIds(ids);
     }
 
@@ -120,7 +129,7 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     @Transactional
-    public void batchUpdateStatus(java.util.List<Long> ids, Integer enabled) {
+    public void batchUpdateStatus(List<Long> ids, Integer enabled) {
         if (ids == null || ids.isEmpty()) {
             return;
         }
@@ -260,5 +269,31 @@ public class RoleServiceImpl implements RoleService {
                     return node;
                 })
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional
+    public void assignPermissions(Long roleId, List<Long> permissionIds) {
+        // 1. 验证角色是否存在
+        if (!roleMapper.selectById(roleId).getDeleted().equals(0)) {
+            throw new RuntimeException("角色不存在或已删除");
+        }
+
+        // 2. 删除角色的所有现有权限
+        rolePermissionMapper.deleteAllByRoleId(roleId);
+
+        // 3. 如果权限列表不为空，批量插入新的权限分配
+        if (permissionIds != null && !permissionIds.isEmpty()) {
+            List<com.cloud.auth.entity.SysRolePermission> rolePermissions = permissionIds.stream()
+                    .map(permId -> {
+                        com.cloud.auth.entity.SysRolePermission rp = new com.cloud.auth.entity.SysRolePermission();
+                        rp.setRoleId(roleId);
+                        rp.setPermId(permId);
+                        return rp;
+                    })
+                    .collect(Collectors.toList());
+
+            rolePermissionMapper.batchInsert(rolePermissions);
+        }
     }
 }

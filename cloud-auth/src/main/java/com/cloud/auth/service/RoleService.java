@@ -90,4 +90,11 @@ public interface RoleService {
      * @return 权限树（带权限分配标记）
      */
     List<PermissionTreeWithAssignedResponse> getPermissionTreeByRole(Long roleId);
+
+    /**
+     * 为角色分配多个权限
+     * @param roleId 角色ID
+     * @param permissionIds 权限ID列表
+     */
+    void assignPermissions(Long roleId, List<Long> permissionIds);
 }

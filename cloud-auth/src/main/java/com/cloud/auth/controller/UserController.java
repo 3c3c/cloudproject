@@ -1,11 +1,13 @@
 package com.cloud.auth.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.cloud.auth.dto.role.RoleResponse;
 import com.cloud.auth.dto.user.BatchUpdateUserStatusRequest;
 import com.cloud.auth.dto.user.UserInfoRequest;
 import com.cloud.auth.dto.user.UserRequest;
 import com.cloud.auth.dto.user.UserResponse;
 import com.cloud.auth.dto.user.UserRoleBindRequest;
+import com.cloud.auth.service.RoleService;
 import com.cloud.auth.service.UserService;
 import com.cloud.common.entity.BasePage;
 import com.cloud.common.result.Result;
@@ -24,6 +26,7 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
+    private final RoleService roleService;
 
     /**
      * 根据用户名称或者账号，分页查询用户列表的功能，列表上有用户账号、用户名称、用户状态
@@ -120,6 +123,35 @@ public class UserController {
         userService.batchUpdateUserStatus(request.getUserIds(), request.getEnabled());
         return Result.ok(true);
     }
+
+    /**
+     * 根据用户Id查询当前用户拥有的所有角色，支持根据关键字（角色编码或角色说明）模糊搜索
+     * @param userId 用户ID
+     * @param keyword 关键字（可选，可匹配角色编码或角色说明）
+     * @return 用户拥有的角色列表
+     */
+    // @PreAuthorize("hasAuthority('role:query')")
+    @GetMapping("/getRolesByUserId/{userId}")
+    public Result<List<RoleResponse>> getRolesByUserId(
+            @PathVariable Long userId,
+            @RequestParam(required = false) String keyword) {
+        return Result.ok(roleService.getRolesByUserId(userId, keyword));
+    }
+
+    /**
+     * 根据用户查询当前用户还没拥有的所有角色，支持根据关键字（角色编码或角色说明）模糊搜索
+     * @param userId 用户ID
+     * @param keyword 关键字（可选，可匹配角色编码或角色说明）
+     * @return 用户未拥有的角色列表
+     */
+    // @PreAuthorize("hasAuthority('role:query')")
+    @GetMapping("/notAssignedRole")
+    public Result<List<RoleResponse>> getRolesNotAssignedToUser(
+            @RequestParam Long userId,
+            @RequestParam(required = false) String keyword) {
+        return Result.ok(roleService.getRolesNotAssignedToUser(userId, keyword));
+    }
+
 
     /**
      * 用户绑定角色功能（一个用户Id可以绑定多个角色Id，覆盖式分配）
