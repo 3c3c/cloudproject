@@ -181,14 +181,6 @@ public class PermissionServiceImpl implements PermissionService {
     }
 
     @Override
-    public List<PermissionResponse> listAll() {
-        LambdaQueryWrapper<SysPermission> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.orderByAsc(SysPermission::getSort).orderByAsc(SysPermission::getId);
-        List<SysPermission> entities = permissionMapper.selectList(queryWrapper);
-        return permissionConverter.toResponseList(entities);
-    }
-
-    @Override
     public Page<PermissionTreeResponse> getTree(BasePage basePage, String permName) {
         List<SysPermission> allPermissions = permissionMapper.selectList(new LambdaQueryWrapper<>());
         return buildTree(basePage, allPermissions, permName);
@@ -256,6 +248,11 @@ public class PermissionServiceImpl implements PermissionService {
             updateEntity.setVisible(visible);
             permissionMapper.update(updateEntity, updateWrapper);
         }
+    }
+
+    @Override
+    public List<SysPermission> getAllPermissions() {
+        return permissionMapper.selectList(new LambdaQueryWrapper<>());
     }
 
     // ==================== 私有辅助方法 ====================

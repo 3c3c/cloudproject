@@ -3,11 +3,15 @@ package com.cloud.auth.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cloud.auth.converter.RoleConverter;
+import com.cloud.auth.dto.permission.PermissionTreeWithAssignedResponse;
 import com.cloud.auth.dto.role.RoleRequest;
 import com.cloud.auth.dto.role.RoleResponse;
+import com.cloud.auth.entity.SysPermission;
 import com.cloud.auth.entity.SysRole;
 import com.cloud.auth.mapper.SysRoleMapper;
+import com.cloud.auth.mapper.SysRolePermissionMapper;
 import com.cloud.auth.mapper.SysUserMapper;
+import com.cloud.auth.service.PermissionService;
 import com.cloud.auth.service.RoleService;
 import com.cloud.common.entity.BasePage;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +20,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -28,6 +34,8 @@ public class RoleServiceImpl implements RoleService {
     private final SysRoleMapper roleMapper;
     private final RoleConverter roleConverter;
     private final SysUserMapper userMapper;
+    private final PermissionService permissionService;
+    private final SysRolePermissionMapper rolePermissionMapper;
 
     @Override
     @Transactional
@@ -194,5 +202,63 @@ public class RoleServiceImpl implements RoleService {
             return;
         }
         userMapper.deleteUserRolesByRoleIds(userId, roleIds);
+    }
+
+    @Override
+    public List<PermissionTreeWithAssignedResponse> getPermissionTreeByRole(Long roleId) {
+        // 1. 获取所有权限
+        List<SysPermission> allPermissions = permissionService.getAllPermissions();
+
+        // 2. 获取角色拥有的权限ID列表
+        List<Long> assignedPermissionIds = rolePermissionMapper.getPermissionIdsByRoleId(roleId);
+        Set<Long> assignedSet = assignedPermissionIds.stream()
+                .collect(Collectors.toSet());
+
+        // 3. 构建权限ID到权限的映射
+        Map<Long, SysPermission> permissionMap = allPermissions.stream()
+                .collect(Collectors.toMap(SysPermission::getId, p -> p));
+
+        // 4. 构建带标记的权限树
+        List<PermissionTreeWithAssignedResponse> tree = buildPermissionTreeWithAssigned(
+                allPermissions, 0L, assignedSet, permissionMap);
+
+        return tree;
+    }
+
+    /**
+     * 递归构建带权限分配标记的权限树
+     */
+    private List<PermissionTreeWithAssignedResponse> buildPermissionTreeWithAssigned(
+            List<SysPermission> allPermissions,
+            Long parentId,
+            Set<Long> assignedSet,
+            Map<Long, SysPermission> permissionMap) {
+
+        return allPermissions.stream()
+                .filter(p -> p.getParentId().equals(parentId))
+                .sorted((p1, p2) -> {
+                    // 先按sort排序，再按ID排序
+                    int sortCompare = Integer.compare(
+                            p1.getSort() != null ? p1.getSort() : 0,
+                            p2.getSort() != null ? p2.getSort() : 0);
+                    return sortCompare != 0 ? sortCompare : Long.compare(p1.getId(), p2.getId());
+                })
+                .map(permission -> {
+                    PermissionTreeWithAssignedResponse node = new PermissionTreeWithAssignedResponse();
+                    node.setId(permission.getId());
+                    node.setPermCode(permission.getPermCode());
+                    node.setPermName(permission.getPermName());
+
+                    // 设置权限分配标记
+                    node.setAssigned(assignedSet.contains(permission.getId()));
+
+                    // 递归构建子节点
+                    List<PermissionTreeWithAssignedResponse> children = buildPermissionTreeWithAssigned(
+                            allPermissions, permission.getId(), assignedSet, permissionMap);
+                    node.setChildren(children);
+
+                    return node;
+                })
+                .collect(Collectors.toList());
     }
 }

@@ -9,7 +9,6 @@ import com.cloud.common.entity.BasePage;
 import com.cloud.common.result.Result;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -36,17 +35,6 @@ public class PermissionController {
             BasePage basePage,
             @RequestParam(required = false) String permName) {
         return Result.ok(permissionService.getTree(basePage, permName));
-    }
-
-    /**
-     * 查询所有权限列表（扁平化）
-     *
-     * @return 权限列表
-     */
-    @PreAuthorize("hasAuthority('permission:query')")
-    @GetMapping("/list")
-    public Result<List<PermissionResponse>> listAll() {
-        return Result.ok(permissionService.listAll());
     }
 
     /**

@@ -41,8 +41,7 @@ public class SecurityConfig {
     private static final String[] WHITELIST = {
             "/auth/login",
             "/auth/public-key",
-            "/auth/sms/send",
-            "/auth/sms/login",
+            "/auth/refresh",
             "/auth/register",
             "/actuator/**"
     };

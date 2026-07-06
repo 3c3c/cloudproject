@@ -1,9 +1,12 @@
 package com.cloud.auth.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.cloud.auth.dto.permission.PermissionTreeWithAssignedResponse;
 import com.cloud.auth.dto.role.RoleRequest;
 import com.cloud.auth.dto.role.RoleResponse;
 import com.cloud.common.entity.BasePage;
+
+import java.util.List;
 
 /**
  * 角色管理服务接口
@@ -28,7 +31,7 @@ public interface RoleService {
     /**
      * 批量删除角色（逻辑删除）
      */
-    void batchDelete(java.util.List<Long> ids);
+    void batchDelete(List<Long> ids);
 
     /**
      * 根据ID查询角色
@@ -51,12 +54,12 @@ public interface RoleService {
     /**
      * 批量更新角色状态
      */
-    void batchUpdateStatus(java.util.List<Long> ids, Integer enabled);
+    void batchUpdateStatus(List<Long> ids, Integer enabled);
 
     /**
      * 查询所有启用的角色
      */
-    java.util.List<RoleResponse> getAllEnabledRoles();
+    List<RoleResponse> getAllEnabledRoles();
 
     /**
      * 根据用户查询当前用户还没拥有的所有角色，支持根据关键字（角色编码或角色说明）模糊搜索
@@ -64,7 +67,7 @@ public interface RoleService {
      * @param keyword 关键字（可选，可匹配角色编码或角色说明）
      * @return 用户未拥有的角色列表
      */
-    java.util.List<RoleResponse> getRolesNotAssignedToUser(Long userId, String keyword);
+    List<RoleResponse> getRolesNotAssignedToUser(Long userId, String keyword);
 
     /**
      * 根据用户ID查询当前用户拥有的所有角色，支持根据关键字（角色编码或角色说明）模糊搜索
@@ -72,12 +75,19 @@ public interface RoleService {
      * @param keyword 关键字（可选，可匹配角色编码或角色说明）
      * @return 用户拥有的角色列表
      */
-    java.util.List<RoleResponse> getRolesByUserId(Long userId, String keyword);
+    List<RoleResponse> getRolesByUserId(Long userId, String keyword);
 
     /**
      * 根据用户ID和角色ID列表批量删除用户角色
      * @param userId 用户ID
      * @param roleIds 角色ID列表
      */
-    void removeUserRoles(Long userId, java.util.List<Long> roleIds);
+    void removeUserRoles(Long userId, List<Long> roleIds);
+
+    /**
+     * 根据角色ID查询所有权限树，并标注角色是否拥有该权限
+     * @param roleId 角色ID
+     * @return 权限树（带权限分配标记）
+     */
+    List<PermissionTreeWithAssignedResponse> getPermissionTreeByRole(Long roleId);
 }

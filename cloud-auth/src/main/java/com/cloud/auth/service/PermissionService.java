@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cloud.auth.dto.permission.PermissionRequest;
 import com.cloud.auth.dto.permission.PermissionResponse;
 import com.cloud.auth.dto.permission.PermissionTreeResponse;
+import com.cloud.auth.entity.SysPermission;
 import com.cloud.common.entity.BasePage;
 
 import java.util.List;
@@ -54,13 +55,6 @@ public interface PermissionService {
     PermissionResponse getById(Long id);
 
     /**
-     * 查询所有权限列表（扁平化）
-     *
-     * @return 权限列表
-     */
-    List<PermissionResponse> listAll();
-
-    /**
      * 查询权限树形列表
      *
      * @param basePage 分页参数
@@ -84,4 +78,11 @@ public interface PermissionService {
      * @param visible 可见性：1=显示，0=隐藏
      */
     void updateVisible(Long id, Integer visible);
+
+    /**
+     * 获取所有权限列表（内部使用）
+     *
+     * @return 所有权限实体列表
+     */
+    List<SysPermission> getAllPermissions();
 }

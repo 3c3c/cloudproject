@@ -1,6 +1,7 @@
 package com.cloud.auth.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.cloud.auth.dto.permission.PermissionTreeWithAssignedResponse;
 import com.cloud.auth.dto.role.BatchUpdateStatusRequest;
 import com.cloud.auth.dto.role.RoleRequest;
 import com.cloud.auth.dto.role.RoleResponse;
@@ -159,9 +160,16 @@ public class RoleController {
         return Result.ok(roleService.getRolesNotAssignedToUser(userId, keyword));
     }
 
+    /**
+     * 根据角色ID查询所有权限树，并标注角色是否拥有该权限
+     * @param roleId 角色ID
+     * @return 权限树（带权限分配标记）
+     */
+    // @PreAuthorize("hasAuthority('role:query')")
+    @GetMapping("/{roleId}/permissions")
+    public Result<List<PermissionTreeWithAssignedResponse>> getPermissionTreeByRole(
+            @PathVariable Long roleId) {
+        return Result.ok(roleService.getPermissionTreeByRole(roleId));
 
-
-
-
-
+    }
 }
