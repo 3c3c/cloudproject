@@ -44,7 +44,8 @@ public enum ResultCode {
     PERMISSION_HAS_CHILDREN(2107, "该权限下有子权限，请先删除子权限"),
     PERMISSION_INVALID_TYPE(2108, "权限类型无效"),
     PERMISSION_PARENT_TYPE_INVALID(2109, "父级权限类型无效"),
-    PERMISSION_ASSIGNED_TO_ROLE(2110, "该权限已分配给角色，无法删除");
+    PERMISSION_ASSIGNED_TO_ROLE(2110, "该权限已分配给角色，无法删除"),
+    PERMISSION_PARAM_INVALID(2111, "权限参数无效");
 
     private final int code;
     private final String message;

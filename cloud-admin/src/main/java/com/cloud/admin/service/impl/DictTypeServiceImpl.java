@@ -240,9 +240,7 @@ public class DictTypeServiceImpl implements DictTypeService {
         List<DictTypeTreeResponse> tree = new ArrayList<>();
 
         for (SysDictType type : allTypes) {
-            if ((parentId == 0L && (type.getParentId() == null || type.getParentId() == 0L)) ||
-                (type.getParentId() != null && type.getParentId().equals(parentId))) {
-
+            if (type.getParentId().equals(parentId)) {
                 // 先尝试查找子节点
                 List<DictTypeTreeResponse> children = buildTree(allTypes, type.getId());
 

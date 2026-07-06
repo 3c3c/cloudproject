@@ -1,9 +1,11 @@
 package com.cloud.auth.controller;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cloud.auth.dto.permission.PermissionRequest;
 import com.cloud.auth.dto.permission.PermissionResponse;
 import com.cloud.auth.dto.permission.PermissionTreeResponse;
 import com.cloud.auth.service.PermissionService;
+import com.cloud.common.entity.BasePage;
 import com.cloud.common.result.Result;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -24,17 +26,16 @@ public class PermissionController {
 
     /**
      * 查询权限树形列表
-     *
+     * @param basePage 分页信息
      * @param permName 权限名称（可选，模糊查询）
-     * @param type     权限类型（可选）
      * @return 树形权限列表
      */
 //    @PreAuthorize("hasAuthority('permission:query')")
     @GetMapping("/tree")
-    public Result<List<PermissionTreeResponse>> getTree(
-            @RequestParam(required = false) String permName,
-            @RequestParam(required = false) Integer type) {
-        return Result.ok(permissionService.getTree(permName, type));
+    public Result<Page<PermissionTreeResponse>> getTree(
+            BasePage basePage,
+            @RequestParam(required = false) String permName) {
+        return Result.ok(permissionService.getTree(basePage, permName));
     }
 
     /**

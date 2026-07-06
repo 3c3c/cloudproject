@@ -1,8 +1,11 @@
 package com.cloud.auth.service;
 
+
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cloud.auth.dto.permission.PermissionRequest;
 import com.cloud.auth.dto.permission.PermissionResponse;
 import com.cloud.auth.dto.permission.PermissionTreeResponse;
+import com.cloud.common.entity.BasePage;
 
 import java.util.List;
 
@@ -60,11 +63,11 @@ public interface PermissionService {
     /**
      * 查询权限树形列表
      *
+     * @param basePage 分页参数
      * @param permName 权限名称（可选，模糊查询）
-     * @param type     权限类型（可选）
-     * @return 树形权限列表
+     * @return 树形权限分页列表
      */
-    List<PermissionTreeResponse> getTree(String permName, Integer type);
+    Page<PermissionTreeResponse> getTree(BasePage basePage, String permName);
 
     /**
      * 更新权限状态（级联更新所有子节点）
