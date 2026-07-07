@@ -146,8 +146,8 @@ public class DictController {
      * @return 字典数据列表
      */
 //    @PreAuthorize("hasAuthority('dict:query')")
-    @GetMapping("/data/by-code/{dictCode}")
-    public Result<List<DictDataResponse>> listDataByCode(@PathVariable String dictCode) {
+    @GetMapping("/data/getDictDataByCode")
+    public Result<List<DictDataResponse>> listDataByCode(@RequestParam String dictCode) {
         return Result.ok(dictDataService.listByDictCode(dictCode));
     }
 
