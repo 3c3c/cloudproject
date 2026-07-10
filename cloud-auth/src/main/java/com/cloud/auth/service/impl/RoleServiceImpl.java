@@ -3,7 +3,7 @@ package com.cloud.auth.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cloud.auth.converter.RoleConverter;
-import com.cloud.auth.dto.permission.PermissionTreeWithAssignedResponse;
+import com.cloud.auth.dto.permission.SimplePermissionTreeResponse;
 import com.cloud.auth.dto.role.RoleRequest;
 import com.cloud.auth.dto.role.RoleResponse;
 import com.cloud.auth.entity.SysPermission;
@@ -214,7 +214,7 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    public List<PermissionTreeWithAssignedResponse> getPermissionTreeByRole(Long roleId) {
+    public List<SimplePermissionTreeResponse> getPermissionTreeByRole(Long roleId) {
         // 1. 获取所有权限
         List<SysPermission> allPermissions = permissionService.getAllPermissions();
 
@@ -228,7 +228,7 @@ public class RoleServiceImpl implements RoleService {
                 .collect(Collectors.toMap(SysPermission::getId, p -> p));
 
         // 4. 构建带标记的权限树
-        List<PermissionTreeWithAssignedResponse> tree = buildPermissionTreeWithAssigned(
+        List<SimplePermissionTreeResponse> tree = buildPermissionTreeWithAssigned(
                 allPermissions, 0L, assignedSet, permissionMap);
 
         return tree;
@@ -237,7 +237,7 @@ public class RoleServiceImpl implements RoleService {
     /**
      * 递归构建带权限分配标记的权限树
      */
-    private List<PermissionTreeWithAssignedResponse> buildPermissionTreeWithAssigned(
+    private List<SimplePermissionTreeResponse> buildPermissionTreeWithAssigned(
             List<SysPermission> allPermissions,
             Long parentId,
             Set<Long> assignedSet,
@@ -253,7 +253,7 @@ public class RoleServiceImpl implements RoleService {
                     return sortCompare != 0 ? sortCompare : Long.compare(p1.getId(), p2.getId());
                 })
                 .map(permission -> {
-                    PermissionTreeWithAssignedResponse node = new PermissionTreeWithAssignedResponse();
+                    SimplePermissionTreeResponse node = new SimplePermissionTreeResponse();
                     node.setId(permission.getId());
                     node.setPermCode(permission.getPermCode());
                     node.setPermName(permission.getPermName());
@@ -262,7 +262,7 @@ public class RoleServiceImpl implements RoleService {
                     node.setAssigned(assignedSet.contains(permission.getId()));
 
                     // 递归构建子节点
-                    List<PermissionTreeWithAssignedResponse> children = buildPermissionTreeWithAssigned(
+                    List<SimplePermissionTreeResponse> children = buildPermissionTreeWithAssigned(
                             allPermissions, permission.getId(), assignedSet, permissionMap);
                     node.setChildren(children);
 

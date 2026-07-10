@@ -12,7 +12,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class PermissionTreeWithAssignedResponse {
+public class SimplePermissionTreeResponse {
 
     /**
      * 主键ID
@@ -32,7 +32,7 @@ public class PermissionTreeWithAssignedResponse {
     /**
      * 子节点列表
      */
-    private List<PermissionTreeWithAssignedResponse> children;
+    private List<SimplePermissionTreeResponse> children;
 
     /**
      * 当前角色是否拥有该权限：true=拥有，false=不拥有

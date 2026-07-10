@@ -1,5 +1,6 @@
 package com.cloud.auth.dto.login;
 
+import com.cloud.auth.dto.permission.PermissionTreeResponse;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,6 +20,11 @@ public class LoginResponse {
     private String mobile;
     private String email;
     private String avatar;
-    private List<String> authorities;
     private Boolean mustChangePassword;
+
+    // 按钮权限列表
+    private List<String> authorities;
+    // 组装好的目录和菜单树
+    private List<PermissionTreeResponse> menuTree;
+
 }

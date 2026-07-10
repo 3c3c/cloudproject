@@ -1,7 +1,7 @@
 package com.cloud.auth.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.cloud.auth.dto.permission.PermissionTreeWithAssignedResponse;
+import com.cloud.auth.dto.permission.SimplePermissionTreeResponse;
 import com.cloud.auth.dto.role.RoleRequest;
 import com.cloud.auth.dto.role.RoleResponse;
 import com.cloud.common.entity.BasePage;
@@ -89,7 +89,7 @@ public interface RoleService {
      * @param roleId 角色ID
      * @return 权限树（带权限分配标记）
      */
-    List<PermissionTreeWithAssignedResponse> getPermissionTreeByRole(Long roleId);
+    List<SimplePermissionTreeResponse> getPermissionTreeByRole(Long roleId);
 
     /**
      * 为角色分配多个权限

@@ -1,7 +1,7 @@
 package com.cloud.auth.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.cloud.auth.dto.permission.PermissionTreeWithAssignedResponse;
+import com.cloud.auth.dto.permission.SimplePermissionTreeResponse;
 import com.cloud.auth.dto.role.AssignPermissionsRequest;
 import com.cloud.auth.dto.role.BatchUpdateStatusRequest;
 import com.cloud.auth.dto.role.RoleRequest;
@@ -139,7 +139,7 @@ public class RoleController {
      */
     // @PreAuthorize("hasAuthority('role:query')")
     @GetMapping("/{roleId}/permissions")
-    public Result<List<PermissionTreeWithAssignedResponse>> getPermissionTreeByRole(
+    public Result<List<SimplePermissionTreeResponse>> getPermissionTreeByRole(
             @PathVariable Long roleId) {
         return Result.ok(roleService.getPermissionTreeByRole(roleId));
 

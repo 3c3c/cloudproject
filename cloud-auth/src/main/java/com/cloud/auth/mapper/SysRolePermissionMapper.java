@@ -36,4 +36,16 @@ public interface SysRolePermissionMapper extends BaseMapper<SysRolePermission> {
      * @param rolePermissions 角色-权限关联列表
      */
     void batchInsert(@Param("rolePermissions") List<SysRolePermission> rolePermissions);
+
+    /**
+     * 批量删除权限的角色绑定关系
+     * @param permIds 权限ID列表
+     */
+    @Delete("<script>" +
+            "DELETE FROM sys_role_permission WHERE perm_id IN " +
+            "<foreach item='item' index='index' collection='permIds' open='(' separator=',' close=')'>" +
+            "#{item}" +
+            "</foreach>" +
+            "</script>")
+    void deleteAllByPermIds(@Param("permIds") List<Long> permIds);
 }

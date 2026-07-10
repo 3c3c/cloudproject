@@ -8,6 +8,7 @@ import com.cloud.auth.dto.permission.PermissionResponse;
 import com.cloud.auth.dto.permission.PermissionTreeResponse;
 import com.cloud.auth.entity.SysPermission;
 import com.cloud.auth.mapper.SysPermissionMapper;
+import com.cloud.auth.mapper.SysRolePermissionMapper;
 import com.cloud.auth.service.PermissionService;
 import com.cloud.common.entity.BasePage;
 import com.cloud.common.exception.BusinessException;
@@ -29,6 +30,7 @@ public class PermissionServiceImpl implements PermissionService {
 
     private final SysPermissionMapper permissionMapper;
     private final PermissionConverter permissionConverter;
+    private final SysRolePermissionMapper rolePermissionMapper;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -138,7 +140,11 @@ public class PermissionServiceImpl implements PermissionService {
         allIdsToDelete.add(id); // 添加当前节点
         descendants.forEach(descendant -> allIdsToDelete.add(descendant.getId()));
 
-        // 3. 检查是否已分配给角色（TODO: 需要角色权限关联表后实现）
+        // 3. 解除所有权限与角色的绑定关系
+        if (!allIdsToDelete.isEmpty()) {
+            rolePermissionMapper.deleteAllByPermIds(allIdsToDelete);
+        }
+
         // 4. 批量删除所有节点
         if (!allIdsToDelete.isEmpty()) {
             permissionMapper.deleteBatchIds(allIdsToDelete);
@@ -165,7 +171,12 @@ public class PermissionServiceImpl implements PermissionService {
             });
         }
 
-        // 3. 批量删除
+        // 3. 解除所有权限与角色的绑定关系
+        if (!allIdsToDelete.isEmpty()) {
+            rolePermissionMapper.deleteAllByPermIds(allIdsToDelete);
+        }
+
+        // 4. 批量删除权限节点
         if (!allIdsToDelete.isEmpty()) {
             permissionMapper.deleteBatchIds(allIdsToDelete);
         }
