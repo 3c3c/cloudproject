@@ -2,6 +2,7 @@ package com.cloud.auth.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.cloud.common.entity.BaseEntity;
 import lombok.Data;
@@ -77,4 +78,7 @@ public class SysPermission extends BaseEntity {
      * 说明
      */
     private String remark;
+
+    @TableLogic(value = "0",delval = "now()")
+    private Long deleted;    // 逻辑删除：0 未删除 删除之后变为时间戳
 }

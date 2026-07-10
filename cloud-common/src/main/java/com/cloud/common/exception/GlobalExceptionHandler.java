@@ -24,7 +24,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BusinessException.class)
     public Result<Void> handleBusiness(BusinessException e) {
         log.warn("业务异常: code={}, msg={}", e.getCode(), e.getMessage());
-        return Result.fail(e.getCode(), e.getMessage());
+        return Result.error(e.getCode(), e.getMessage());
     }
 
     /** 认证异常：未登录 / token 失效 */
@@ -32,7 +32,7 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public Result<Void> handleAuthentication(AuthenticationException e) {
         log.warn("认证异常: {}", e.getMessage());
-        return Result.fail(ResultCode.UNAUTHORIZED, e.getMessage());
+        return Result.error(ResultCode.UNAUTHORIZED, e.getMessage());
     }
 
     /** 权限不足 */
@@ -40,32 +40,32 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public Result<Void> handleAccessDenied(AccessDeniedException e) {
         log.warn("权限不足: {}", e.getMessage());
-        return Result.fail(ResultCode.FORBIDDEN);
+        return Result.error(ResultCode.FORBIDDEN);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public Result<Void> handleValidation(MethodArgumentNotValidException e) {
         FieldError fieldError = e.getBindingResult().getFieldError();
         String msg = fieldError != null ? fieldError.getDefaultMessage() : "参数校验失败";
-        return Result.fail(ResultCode.BAD_REQUEST, msg);
+        return Result.error(ResultCode.BAD_REQUEST, msg);
     }
 
     @ExceptionHandler(BindException.class)
     public Result<Void> handleBind(BindException e) {
         FieldError fieldError = e.getBindingResult().getFieldError();
         String msg = fieldError != null ? fieldError.getDefaultMessage() : "参数校验失败";
-        return Result.fail(ResultCode.BAD_REQUEST, msg);
+        return Result.error(ResultCode.BAD_REQUEST, msg);
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public Result<Void> handleHttpMessageNotReadable(HttpMessageNotReadableException e) {
-        return Result.fail(ResultCode.BAD_REQUEST, "请求体格式错误");
+        return Result.error(ResultCode.BAD_REQUEST, "请求体格式错误");
     }
 
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public Result<Void> handleException(Exception e) {
         log.error("系统异常", e);
-        return Result.fail(ResultCode.INTERNAL_ERROR, e.getMessage());
+        return Result.error(ResultCode.INTERNAL_ERROR, e.getMessage());
     }
 }

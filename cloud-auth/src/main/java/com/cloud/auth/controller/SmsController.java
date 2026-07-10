@@ -23,6 +23,6 @@ public class SmsController {
     @PostMapping("/send")
     public Result<Void> send(@Valid @RequestBody SendCodeRequest req) {
         smsService.sendCode(req.getMobile());
-        return Result.ok();
+        return Result.success();
     }
 }

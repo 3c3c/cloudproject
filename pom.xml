@@ -25,6 +25,7 @@
         <module>cloud-admin</module>
         <module>cloud-product</module>
         <module>cloud-order</module>
+        <module>cloud-file</module>
     </modules>
 
     <properties>
@@ -41,6 +42,8 @@
         <mapstruct.version>1.5.5.Final</mapstruct.version>
         <lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version>
         <hutool.version>5.8.25</hutool.version>
+        <minio.version>8.5.7</minio.version>
+        <aliyun-oss.version>3.17.4</aliyun-oss.version>
     </properties>
 
     <dependencyManagement>
@@ -104,6 +107,18 @@
                 <groupId>cn.hutool</groupId>
                 <artifactId>hutool-all</artifactId>
                 <version>${hutool.version}</version>
+            </dependency>
+            <!-- MinIO SDK -->
+            <dependency>
+                <groupId>io.minio</groupId>
+                <artifactId>minio</artifactId>
+                <version>${minio.version}</version>
+            </dependency>
+            <!-- Aliyun OSS SDK -->
+            <dependency>
+                <groupId>com.aliyun.oss</groupId>
+                <artifactId>aliyun-sdk-oss</artifactId>
+                <version>${aliyun-oss.version}</version>
             </dependency>
             <!-- 内部公共模块 -->
             <dependency>

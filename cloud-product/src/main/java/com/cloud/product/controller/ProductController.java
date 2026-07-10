@@ -32,7 +32,7 @@ public class ProductController {
     @PreAuthorize("hasAuthority('product:query')")
     @GetMapping
     public Result<List<Product>> list() {
-        return Result.ok(productService.list());
+        return Result.success(productService.list());
     }
 
     @PreAuthorize("hasAuthority('product:query')")
@@ -42,25 +42,25 @@ public class ProductController {
         if (product == null) {
             throw new BusinessException(ResultCode.NOT_FOUND);
         }
-        return Result.ok(product);
+        return Result.success(product);
     }
 
     @PreAuthorize("hasAuthority('product:add')")
     @PostMapping
     public Result<Product> add(@Valid @RequestBody Product product) {
         productService.save(product);
-        return Result.ok(product);
+        return Result.success(product);
     }
 
     @PreAuthorize("hasAuthority('product:update')")
     @PutMapping
     public Result<Boolean> update(@Valid @RequestBody Product product) {
-        return Result.ok(productService.updateById(product));
+        return Result.success(productService.updateById(product));
     }
 
     @PreAuthorize("hasAuthority('product:delete')")
     @DeleteMapping("/{id}")
     public Result<Boolean> delete(@PathVariable Long id) {
-        return Result.ok(productService.removeById(id));
+        return Result.success(productService.removeById(id));
     }
 }

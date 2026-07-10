@@ -32,7 +32,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public Result<LoginResponse> login(@Valid @RequestBody LoginRequest req) {
-        return Result.ok(authService.login(req));
+        return Result.success(authService.login(req));
     }
 
     /**
@@ -44,23 +44,23 @@ public class AuthController {
     @GetMapping("/public-key")
     public Result<String> getPublicKey() {
         String publicKeyBase64 = rsaObject.getPublicKeyBase64();
-        return Result.ok(publicKeyBase64);
+        return Result.success(publicKeyBase64);
     }
 
     @PostMapping("/register")
     public Result<Long> register(@Valid @RequestBody RegisterRequest req) {
         SysUser user = userService.register(req);
-        return Result.ok(user.getId());
+        return Result.success(user.getId());
     }
 
     @PostMapping("/logout")
     public Result<Void> logout(@RequestHeader("Authorization") String authorization) {
         authService.logout(authorization);
-        return Result.ok();
+        return Result.success();
     }
 
     @PostMapping("/refresh")
     public Result<LoginResponse> refresh() {
-        return Result.ok(authService.refresh());
+        return Result.success(authService.refresh());
     }
 }

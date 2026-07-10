@@ -30,6 +30,6 @@ public class RestAccessDeniedHandler implements AccessDeniedHandler {
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding(StandardCharsets.UTF_8.name());
         response.getWriter().write(
-                objectMapper.writeValueAsString(Result.fail(ResultCode.FORBIDDEN)));
+                objectMapper.writeValueAsString(Result.error(ResultCode.FORBIDDEN)));
     }
 }

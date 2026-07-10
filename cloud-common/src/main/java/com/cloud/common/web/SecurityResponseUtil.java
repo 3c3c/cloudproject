@@ -23,6 +23,6 @@ public final class SecurityResponseUtil {
         response.setStatus(code.getCode());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding(StandardCharsets.UTF_8.name());
-        response.getWriter().write(OBJECT_MAPPER.writeValueAsString(Result.fail(code)));
+        response.getWriter().write(OBJECT_MAPPER.writeValueAsString(Result.error(code)));
     }
 }

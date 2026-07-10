@@ -64,10 +64,10 @@ public class SecurityConfig {
         mobileFilter.setAuthenticationSuccessHandler((request, response, authentication) -> {
             LoginUser loginUser = (LoginUser) authentication.getPrincipal();
             LoginResponse resp = tokenService.issueToken(loginUser);
-            writeJson(response, Result.ok(resp), HttpServletResponse.SC_OK);
+            writeJson(response, Result.success(resp), HttpServletResponse.SC_OK);
         });
         mobileFilter.setAuthenticationFailureHandler((request, response, exception) ->
-                writeJson(response, Result.fail(ResultCode.SMS_CODE_ERROR, exception.getMessage()),
+                writeJson(response, Result.error(ResultCode.SMS_CODE_ERROR, exception.getMessage()),
                         HttpServletResponse.SC_UNAUTHORIZED));
 
         http

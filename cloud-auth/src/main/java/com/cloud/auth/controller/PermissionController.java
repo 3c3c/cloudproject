@@ -34,7 +34,7 @@ public class PermissionController {
     public Result<Page<PermissionTreeResponse>> getTree(
             BasePage basePage,
             @RequestParam(required = false) String permName) {
-        return Result.ok(permissionService.getTree(basePage, permName));
+        return Result.success(permissionService.getTree(basePage, permName));
     }
 
     /**
@@ -46,7 +46,7 @@ public class PermissionController {
 //    @PreAuthorize("hasAuthority('permission:query')")
     @GetMapping("/{id}")
     public Result<PermissionResponse> getById(@PathVariable Long id) {
-        return Result.ok(permissionService.getById(id));
+        return Result.success(permissionService.getById(id));
     }
 
     /**
@@ -58,7 +58,7 @@ public class PermissionController {
 //    @PreAuthorize("hasAuthority('permission:create')")
     @PostMapping
     public Result<PermissionResponse> create(@Valid @RequestBody PermissionRequest request) {
-        return Result.ok(permissionService.create(request));
+        return Result.success(permissionService.create(request));
     }
 
     /**
@@ -73,7 +73,7 @@ public class PermissionController {
     public Result<PermissionResponse> update(
             @PathVariable Long id,
             @Valid @RequestBody PermissionRequest request) {
-        return Result.ok(permissionService.update(id, request));
+        return Result.success(permissionService.update(id, request));
     }
 
     /**
@@ -86,7 +86,7 @@ public class PermissionController {
     @DeleteMapping("/{id}")
     public Result<Void> delete(@PathVariable Long id) {
         permissionService.delete(id);
-        return Result.ok();
+        return Result.success();
     }
 
     /**
@@ -99,7 +99,7 @@ public class PermissionController {
     @DeleteMapping("/batch")
     public Result<Void> batchDelete(@RequestBody List<Long> ids) {
         permissionService.batchDelete(ids);
-        return Result.ok();
+        return Result.success();
     }
 
     /**
@@ -115,7 +115,7 @@ public class PermissionController {
             @PathVariable Long id,
             @RequestParam Integer enabled) {
         permissionService.updateEnabled(id, enabled);
-        return Result.ok();
+        return Result.success();
     }
 
     /**
@@ -131,6 +131,6 @@ public class PermissionController {
             @PathVariable Long id,
             @RequestParam Integer visible) {
         permissionService.updateVisible(id, visible);
-        return Result.ok();
+        return Result.success();
     }
 }

@@ -32,7 +32,7 @@ public class DictController {
 //    @PreAuthorize("hasAuthority('dict:query')")
     @GetMapping("/types/all")
     public Result<List<DictTypeResponse>> listAllTypes() {
-        return Result.ok(dictTypeService.listAll());
+        return Result.success(dictTypeService.listAll());
     }
 
     /**
@@ -44,7 +44,7 @@ public class DictController {
 //    @PreAuthorize("hasAuthority('dict:update')")
     @PostMapping("/types")
     public Result<DictTypeResponse> createType(@Valid @RequestBody DictTypeRequest request) {
-        return Result.ok(dictTypeService.create(request));
+        return Result.success(dictTypeService.create(request));
     }
 
     /**
@@ -58,7 +58,7 @@ public class DictController {
     @PutMapping("/types/{id}")
     public Result<DictTypeResponse> updateType(@PathVariable Long id,
                                                  @Valid @RequestBody DictTypeRequest request) {
-        return Result.ok(dictTypeService.update(id, request));
+        return Result.success(dictTypeService.update(id, request));
     }
 
     /**
@@ -71,7 +71,7 @@ public class DictController {
     @DeleteMapping("/types/batch")
     public Result<Void> batchDeleteTypes(@RequestBody List<Long> ids) {
         dictTypeService.batchDelete(ids);
-        return Result.ok();
+        return Result.success();
     }
 
     /**
@@ -83,7 +83,7 @@ public class DictController {
 //    @PreAuthorize("hasAuthority('dict:query')")
     @GetMapping("/types/by-code/{dictCode}")
     public Result<DictTypeResponse> searchType(@PathVariable String dictCode) {
-        return Result.ok(dictTypeService.getByCode(dictCode));
+        return Result.success(dictTypeService.getByCode(dictCode));
     }
 
     /**
@@ -95,7 +95,7 @@ public class DictController {
 //    @PreAuthorize("hasAuthority('dict:query')")
     @PostMapping("/types/by-codes")
     public Result<List<DictTypeResponse>> searchTypesByCodes(@RequestBody List<String> dictCodes) {
-        return Result.ok(dictTypeService.getByCodes(dictCodes));
+        return Result.success(dictTypeService.getByCodes(dictCodes));
     }
 
     /**
@@ -106,7 +106,7 @@ public class DictController {
 //    @PreAuthorize("hasAuthority('dict:query')")
     @GetMapping("/types/tree")
     public Result<List<DictTypeTreeResponse>> getTypeTree() {
-        return Result.ok(dictTypeService.getTree());
+        return Result.success(dictTypeService.getTree());
     }
 
     /**
@@ -119,7 +119,7 @@ public class DictController {
     @PutMapping("/types/{id}/status")
     public Result<Boolean> updateTypeStatus(@PathVariable Long id, @RequestParam Integer status) {
         dictTypeService.updateStatus(id, status);
-        return Result.ok(true);
+        return Result.success(true);
     }
 
 
@@ -136,7 +136,7 @@ public class DictController {
     @GetMapping("/data")
     public Result<IPage<DictDataResponse>> pageData(BasePage basePage,
                                                     @RequestParam(required = false) Long dictTypeId) {
-        return Result.ok(dictDataService.page(basePage, dictTypeId));
+        return Result.success(dictDataService.page(basePage, dictTypeId));
     }
 
     /**
@@ -148,7 +148,7 @@ public class DictController {
 //    @PreAuthorize("hasAuthority('dict:query')")
     @GetMapping("/data/getDictDataByCode")
     public Result<List<DictDataResponse>> listDataByCode(@RequestParam String dictCode) {
-        return Result.ok(dictDataService.listByDictCode(dictCode));
+        return Result.success(dictDataService.listByDictCode(dictCode));
     }
 
     /**
@@ -160,7 +160,7 @@ public class DictController {
 //    @PreAuthorize("hasAuthority('dict:update')")
     @PostMapping("/data")
     public Result<DictDataResponse> createData(@Valid @RequestBody DictDataRequest request) {
-        return Result.ok(dictDataService.create(request));
+        return Result.success(dictDataService.create(request));
     }
 
     /**
@@ -174,7 +174,7 @@ public class DictController {
     @PutMapping("/data/{id}")
     public Result<DictDataResponse> updateData(@PathVariable Long id,
                                                 @Valid @RequestBody DictDataRequest request) {
-        return Result.ok(dictDataService.update(id, request));
+        return Result.success(dictDataService.update(id, request));
     }
 
     /**
@@ -187,6 +187,6 @@ public class DictController {
     @DeleteMapping("/data/batch")
     public Result<Void> batchDeleteData(@RequestBody List<Long> ids) {
         dictDataService.batchDelete(ids);
-        return Result.ok();
+        return Result.success();
     }
 }

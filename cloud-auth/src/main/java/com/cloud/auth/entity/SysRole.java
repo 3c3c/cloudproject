@@ -17,6 +17,6 @@ public class SysRole extends BaseEntity {
     private String remark;      // 角色说明（原roleName）
     private Integer enabled;    // 状态：1 启用 0 禁用
 
-    @TableLogic
-    private Integer deleted;    // 逻辑删除：0 未删除 1 已删除
+    @TableLogic(value = "0",delval = "now()")
+    private Long deleted;    // 逻辑删除：0 未删除 删除之后变为时间戳
 }

@@ -29,7 +29,7 @@ public class OrderController {
     @PreAuthorize("hasAuthority('order:query')")
     @GetMapping
     public Result<List<Order>> list() {
-        return Result.ok(orderService.listMyOrders());
+        return Result.success(orderService.listMyOrders());
     }
 
     @PreAuthorize("hasAuthority('order:query')")
@@ -39,12 +39,12 @@ public class OrderController {
         if (order == null) {
             throw new BusinessException(ResultCode.NOT_FOUND);
         }
-        return Result.ok(order);
+        return Result.success(order);
     }
 
     @PreAuthorize("hasAuthority('order:create')")
     @PostMapping
     public Result<Order> create(@RequestBody Order order) {
-        return Result.ok(orderService.createOrder(order));
+        return Result.success(orderService.createOrder(order));
     }
 }

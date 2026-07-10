@@ -38,7 +38,7 @@ public class UserController {
     @GetMapping
     public Result<Page<UserResponse>> page(BasePage basePage,
             @RequestParam(required = false) String keyword) {
-        return Result.ok(userService.pageUsers(basePage, keyword));
+        return Result.success(userService.pageUsers(basePage, keyword));
     }
 
     /**
@@ -49,7 +49,7 @@ public class UserController {
     // @PreAuthorize("hasAuthority('user:update')")
     @PostMapping
     public Result<UserResponse> create(@Valid @RequestBody UserRequest request) {
-        return Result.ok(userService.createUser(request));
+        return Result.success(userService.createUser(request));
     }
 
     /**
@@ -61,7 +61,7 @@ public class UserController {
     // @PreAuthorize("hasAuthority('user:update')")
     @PutMapping("/{id}")
     public Result<UserResponse> update(@PathVariable Long id, @Valid @RequestBody UserInfoRequest request) {
-        return Result.ok(userService.updateUser(id, request));
+        return Result.success(userService.updateUser(id, request));
     }
 
     /**
@@ -73,7 +73,7 @@ public class UserController {
     @DeleteMapping("/{id}")
     public Result<Boolean> delete(@PathVariable Long id) {
         userService.deleteUser(id);
-        return Result.ok(true);
+        return Result.success(true);
     }
 
     /**
@@ -85,7 +85,7 @@ public class UserController {
     @DeleteMapping("/batch")
     public Result<Boolean> batchDelete(@RequestBody List<Long> ids) {
         userService.batchDeleteUsers(ids);
-        return Result.ok(true);
+        return Result.success(true);
     }
 
     /**
@@ -96,7 +96,7 @@ public class UserController {
     // @PreAuthorize("hasAuthority('user:query')")
     @GetMapping("/{id}")
     public Result<UserResponse> getById(@PathVariable Long id) {
-        return Result.ok(userService.getUserById(id));
+        return Result.success(userService.getUserById(id));
     }
 
     /**
@@ -109,7 +109,7 @@ public class UserController {
     @PutMapping("/{id}/status")
     public Result<Boolean> updateStatus(@PathVariable Long id, @RequestParam Integer enabled) {
         userService.updateUserStatus(id, enabled);
-        return Result.ok(true);
+        return Result.success(true);
     }
 
     /**
@@ -121,7 +121,7 @@ public class UserController {
     @PutMapping("/batch/status")
     public Result<Boolean> batchUpdateStatus(@Valid @RequestBody BatchUpdateUserStatusRequest request) {
         userService.batchUpdateUserStatus(request.getUserIds(), request.getEnabled());
-        return Result.ok(true);
+        return Result.success(true);
     }
 
     /**
@@ -135,7 +135,7 @@ public class UserController {
     public Result<List<RoleResponse>> getRolesByUserId(
             @PathVariable Long userId,
             @RequestParam(required = false) String keyword) {
-        return Result.ok(roleService.getRolesByUserId(userId, keyword));
+        return Result.success(roleService.getRolesByUserId(userId, keyword));
     }
 
     /**
@@ -149,7 +149,7 @@ public class UserController {
     public Result<List<RoleResponse>> getRolesNotAssignedToUser(
             @RequestParam Long userId,
             @RequestParam(required = false) String keyword) {
-        return Result.ok(roleService.getRolesNotAssignedToUser(userId, keyword));
+        return Result.success(roleService.getRolesNotAssignedToUser(userId, keyword));
     }
 
 
@@ -162,7 +162,7 @@ public class UserController {
     @PutMapping("/roles")
     public Result<Boolean> assignRoles(@Valid @RequestBody UserRoleBindRequest request) {
         userService.assignUserRoles(request.getUserId(), request.getRoleIds());
-        return Result.ok(true);
+        return Result.success(true);
     }
 
     /**
@@ -175,7 +175,7 @@ public class UserController {
     @DeleteMapping("/{userId}/roles")
     public Result<Boolean> removeUserRoles(@PathVariable Long userId, @RequestBody List<Long> roleIds) {
         userService.removeUserRoles(userId, roleIds);
-        return Result.ok(true);
+        return Result.success(true);
     }
 
 

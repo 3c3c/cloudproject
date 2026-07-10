@@ -95,13 +95,11 @@ public class UserServiceImpl implements UserService {
             throw new BusinessException(ResultCode.ACCOUNT_DISABLED);
         }
         List<GrantedAuthority> authorities = new ArrayList<>();
-        // 角色：ROLE_xxx（hasRole 匹配时去掉 ROLE_ 前缀）
-        for (SysRole role : userMapper.selectRolesByUserId(user.getId())) {
-            authorities.add(new SimpleGrantedAuthority(role.getRoleCode()));
-        }
-        // 权限：perm_code（hasAuthority 直接匹配）
+        // 按钮权限码（type=3）：用于前端按钮级别的权限控制
         for (SysPermission perm : userMapper.selectPermissionsByUserId(user.getId())) {
-            authorities.add(new SimpleGrantedAuthority(perm.getPermCode()));
+            if (perm.getType() != null && perm.getType() == 3) {
+                authorities.add(new SimpleGrantedAuthority(perm.getPermCode()));
+            }
         }
         LoginUser loginUser = new LoginUser(user.getId(), user.getUsername(), user.getPassword(), user.getMobile(), authorities);
         loginUser.setNickname(user.getNickname());

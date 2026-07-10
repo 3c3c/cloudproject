@@ -36,7 +36,7 @@ public class RoleController {
     public Result<Page<RoleResponse>> page(
             BasePage basePage,
             @RequestParam(required = false) String keyword) {
-        return Result.ok(roleService.page(basePage, keyword));
+        return Result.success(roleService.page(basePage, keyword));
     }
 
     /**
@@ -48,7 +48,7 @@ public class RoleController {
     @DeleteMapping("/{id}")
     public Result<Void> delete(@PathVariable Long id) {
         roleService.delete(id);
-        return Result.ok();
+        return Result.success();
     }
 
     /**
@@ -60,7 +60,7 @@ public class RoleController {
     @DeleteMapping("/batch")
     public Result<Void> batchDelete(@RequestBody List<Long> ids) {
         roleService.batchDelete(ids);
-        return Result.ok();
+        return Result.success();
     }
 
     /**
@@ -71,7 +71,7 @@ public class RoleController {
     // @PreAuthorize("hasAuthority('role:update')")
     @PostMapping
     public Result<RoleResponse> create(@Valid @RequestBody RoleRequest request) {
-        return Result.ok(roleService.create(request));
+        return Result.success(roleService.create(request));
     }
 
     /**
@@ -83,7 +83,7 @@ public class RoleController {
     // @PreAuthorize("hasAuthority('role:update')")
     @PutMapping("/{id}")
     public Result<RoleResponse> update(@PathVariable Long id, @Valid @RequestBody RoleRequest request) {
-        return Result.ok(roleService.update(id, request));
+        return Result.success(roleService.update(id, request));
     }
 
     /**
@@ -94,7 +94,7 @@ public class RoleController {
     // @PreAuthorize("hasAuthority('role:query')")
     @GetMapping("/{id}")
     public Result<RoleResponse> getById(@PathVariable Long id) {
-        return Result.ok(roleService.getById(id));
+        return Result.success(roleService.getById(id));
     }
 
     /**
@@ -107,7 +107,7 @@ public class RoleController {
     @PutMapping("/{id}/status")
     public Result<Boolean> updateStatus(@PathVariable Long id, @RequestParam Integer enabled) {
         roleService.updateStatus(id, enabled);
-        return Result.ok(true);
+        return Result.success(true);
     }
 
     /**
@@ -117,7 +117,7 @@ public class RoleController {
     // @PreAuthorize("hasAuthority('role:query')")
     @GetMapping("/all-enabled")
     public Result<List<RoleResponse>> getAllEnabledRoles() {
-        return Result.ok(roleService.getAllEnabledRoles());
+        return Result.success(roleService.getAllEnabledRoles());
     }
 
     /**
@@ -129,7 +129,7 @@ public class RoleController {
     @PutMapping("/batch/status")
     public Result<Boolean> batchUpdateStatus(@Valid @RequestBody BatchUpdateStatusRequest request) {
         roleService.batchUpdateStatus(request.getIds(), request.getEnabled());
-        return Result.ok(true);
+        return Result.success(true);
     }
 
     /**
@@ -141,7 +141,7 @@ public class RoleController {
     @GetMapping("/{roleId}/permissions")
     public Result<List<SimplePermissionTreeResponse>> getPermissionTreeByRole(
             @PathVariable Long roleId) {
-        return Result.ok(roleService.getPermissionTreeByRole(roleId));
+        return Result.success(roleService.getPermissionTreeByRole(roleId));
 
     }
 
@@ -157,7 +157,7 @@ public class RoleController {
             @PathVariable Long roleId,
             @Valid @RequestBody AssignPermissionsRequest request) {
         roleService.assignPermissions(roleId, request.getPermissionIds());
-        return Result.ok();
+        return Result.success();
     }
 
 }

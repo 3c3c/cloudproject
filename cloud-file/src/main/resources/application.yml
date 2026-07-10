@@ -1,0 +1,14 @@
+spring:
+  cloud:
+    nacos:
+      server-addr: ${NACOS_ADDR:127.0.0.1:8848}
+      namespace: ${NACOS_NS:}        # 留空 = Nacos 的 public 命名空间；自定义则填「命名空间 ID」
+      username: ${NACOS_USER:nacos}
+      password: ${NACOS_PASSWORD:nacos}
+    discovery:
+      enabled: true
+      server-addr: ${NACOS_ADDR:127.0.0.1:8848}
+  config:
+    import:
+      - optional:nacos:cloud-common.yaml
+      - optional:nacos:cloud-file.yaml

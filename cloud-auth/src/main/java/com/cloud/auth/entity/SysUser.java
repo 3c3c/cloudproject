@@ -2,6 +2,7 @@ package com.cloud.auth.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.cloud.common.entity.BaseEntity;
 import lombok.Data;
@@ -23,4 +24,7 @@ public class SysUser extends BaseEntity {
     private String avatar;          // 头像 URL
     private Integer enabled;        // 状态：1 启用 0 禁用
     private Boolean mustChangePassword; // 是否下次登录强制改密
+
+    @TableLogic(value = "0",delval = "now()")
+    private Long deleted;    // 逻辑删除：0 未删除 删除之后变为时间戳
 }

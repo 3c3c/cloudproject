@@ -45,7 +45,18 @@ public enum ResultCode {
     PERMISSION_INVALID_TYPE(2108, "权限类型无效"),
     PERMISSION_PARENT_TYPE_INVALID(2109, "父级权限类型无效"),
     PERMISSION_ASSIGNED_TO_ROLE(2110, "该权限已分配给角色，无法删除"),
-    PERMISSION_PARAM_INVALID(2111, "权限参数无效");
+    PERMISSION_PARAM_INVALID(2111, "权限参数无效"),
+
+    // 文件管理相关错误码 (2200-2299)
+    FILE_UPLOAD_FAILED(2201, "文件上传失败"),
+    FILE_NOT_FOUND(2202, "文件不存在"),
+    FILE_DOWNLOAD_FAILED(2203, "文件下载失败"),
+    FILE_DELETE_FAILED(2204, "文件删除失败"),
+    FILE_TOO_LARGE(2205, "文件大小超过限制"),
+    FILE_TYPE_NOT_ALLOWED(2206, "不支持的文件类型"),
+    FILE_CONTENT_TYPE_MISMATCH(2207, "文件内容类型不匹配"),
+    INVALID_FILE_KEY(2208, "无效的文件Key"),
+    FILE_ALREADY_EXISTS(2209, "文件已存在");
 
     private final int code;
     private final String message;
