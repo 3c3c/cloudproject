@@ -126,6 +126,12 @@
                 <artifactId>cloud-common</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <!-- 文件服务 API 模块 -->
+            <dependency>
+                <groupId>com.cloud</groupId>
+                <artifactId>cloud-file-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 

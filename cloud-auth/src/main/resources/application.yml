@@ -12,3 +12,9 @@ spring:
     import:
       - optional:nacos:cloud-common.yaml
       - optional:nacos:cloud-auth.yaml
+
+# 文件服务配置
+cloud:
+  file:
+    # 文件服务地址，用于文件上传
+    service-url: ${FILE_SERVICE_URL:http://cloud-file/file}

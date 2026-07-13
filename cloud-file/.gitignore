@@ -33,3 +33,6 @@ logs/
 *.bak
 *.swp
 *~.nib
+
+# 排除所有子模块的编译代码
+**/target/
