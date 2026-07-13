@@ -26,8 +26,4 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         return loginUser;
     }
 
-    /** 供手机号认证加载或自动注册用户 */
-    public LoginUser loadByMobile(String mobile) {
-        return userService.loadLoginUserByMobile(mobile);
-    }
 }

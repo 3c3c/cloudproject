@@ -46,7 +46,7 @@ public class RoleServiceImpl implements RoleService {
             role.setEnabled(1);
         }
         // 设置逻辑删除字段为未删除
-        role.setDeleted(0);
+        role.setDeleted(0L);
         roleMapper.insert(role);
         return roleConverter.toResponse(role);
     }
