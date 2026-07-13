@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * 认证接口：登录 / 注册 / 退出 / 刷新。
- * 注意：手机号验证码登录（/auth/sms/login）由 MobileAuthenticationFilter 拦截，不在此 Controller。
  */
 @RestController
 @RequestMapping("/auth")

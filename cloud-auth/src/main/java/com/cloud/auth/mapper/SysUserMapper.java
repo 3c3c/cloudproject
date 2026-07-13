@@ -23,9 +23,6 @@ public interface SysUserMapper extends BaseMapper<SysUser> {
     /** 按用户名或手机号查询用户 */
     SysUser selectByUsernameOrMobile(@Param("keyword") String keyword);
 
-    /** 按手机号查询用户 */
-    SysUser selectByMobile(@Param("mobile") String mobile);
-
     /** 绑定用户角色（注册时赋予默认角色） */
     @Insert("INSERT IGNORE INTO sys_user_role(user_id, role_id) VALUES(#{userId}, #{roleId})")
     int bindRole(@Param("userId") Long userId, @Param("roleId") Long roleId);

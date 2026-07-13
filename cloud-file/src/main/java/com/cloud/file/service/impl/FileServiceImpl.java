@@ -47,8 +47,7 @@ public class FileServiceImpl implements FileService {
         try (InputStream inputStream = file.getInputStream()) {
             md5 = DigestUtil.md5Hex(inputStream);
         } catch (Exception e) {
-            throw new BusinessException(ResultCode.FILE_UPLOAD_FAILED,
-                    "Failed to calculate file MD5");
+            throw new BusinessException(ResultCode.FILE_UPLOAD_FAILED, "计算文件MD5失败");
         }
 
         // 3. 检查文件是否已存在（去重）
@@ -58,7 +57,7 @@ public class FileServiceImpl implements FileService {
                         .eq(FileInfo::getDeleted, false)
         );
         if (existingFile != null) {
-            log.info("File already exists, returning existing record: {}", existingFile.getId());
+            log.info("文件已存在，返回已有记录: {}", existingFile.getId());
             return fileConverter.toResponse(existingFile);
         }
 
@@ -95,7 +94,7 @@ public class FileServiceImpl implements FileService {
 
         fileInfoMapper.insert(fileInfo);
 
-        log.info("File uploaded successfully: id={}, key={}", fileInfo.getId(), fileKey);
+        log.info("文件上传成功: id={}, key={}", fileInfo.getId(), fileKey);
         return fileConverter.toResponse(fileInfo);
     }
 
@@ -156,7 +155,7 @@ public class FileServiceImpl implements FileService {
         // 1. 删除存储中的文件
         boolean deleted = fileStorageService.delete(fileInfo.getFileKey());
         if (!deleted) {
-            log.warn("Failed to delete file from storage: {}", fileInfo.getFileKey());
+            log.warn("从存储中删除文件失败: {}", fileInfo.getFileKey());
         }
 
         // 2. 逻辑删除数据库记录
@@ -213,7 +212,7 @@ public class FileServiceImpl implements FileService {
      */
     private void validateFile(MultipartFile file) {
         if (file == null || file.isEmpty()) {
-            throw new BusinessException(ResultCode.BAD_REQUEST, "File is empty");
+            throw new BusinessException(ResultCode.BAD_REQUEST, "文件为空");
         }
 
         // 文件大小校验

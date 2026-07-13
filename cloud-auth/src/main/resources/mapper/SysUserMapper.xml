@@ -26,12 +26,4 @@
         LIMIT 1
     </select>
 
-    <select id="selectByMobile" resultType="com.cloud.auth.entity.SysUser">
-        SELECT id, username, nickname, password, mobile, email, avatar,
-               enabled, must_change_password, create_time, update_time
-        FROM sys_user
-        WHERE mobile = #{mobile}
-        LIMIT 1
-    </select>
-
 </mapper>

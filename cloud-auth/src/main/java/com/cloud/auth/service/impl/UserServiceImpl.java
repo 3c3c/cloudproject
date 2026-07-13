@@ -52,12 +52,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public LoginUser loadLoginUserByMobile(String mobile) {
-        SysUser user = userMapper.selectByMobile(mobile);
-        return user == null ? null : toLoginUser(user);
-    }
-
-    @Override
     public SysUser register(RegisterRequest req) {
         if (userMapper.selectByUsernameOrMobile(req.getUsername()) != null) {
             throw new BusinessException(ResultCode.BAD_REQUEST, "用户名已存在");

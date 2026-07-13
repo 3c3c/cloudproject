@@ -28,8 +28,8 @@ import java.nio.charset.StandardCharsets;
 /**
  * 认证服务安全配置（Spring Security 6 lambda DSL）。
  * - STATELESS，关闭 CSRF
- * - 放行登录/注册/发验证码；其余需认证
- * - 接入 JWT 过滤器、手机号验证码登录过滤器
+ * - 放行登录/注册；其余需认证
+ * - 接入 JWT 过滤器
  * - 401/403 统一 JSON 返回
  */
 @Configuration
@@ -47,7 +47,6 @@ public class SecurityConfig {
     };
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
-    private final MobileAuthenticationProvider mobileAuthenticationProvider;
     private final RestAuthenticationEntryPoint authenticationEntryPoint;
     private final RestAccessDeniedHandler accessDeniedHandler;
     private final TokenService tokenService;
@@ -57,19 +56,6 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        // 手机号验证码登录 Filter
-        AuthenticationConfiguration authConfig = http.getSharedObject(AuthenticationConfiguration.class);
-        MobileAuthenticationFilter mobileFilter = new MobileAuthenticationFilter();
-        mobileFilter.setAuthenticationManager(authenticationManager(authConfig));
-        mobileFilter.setAuthenticationSuccessHandler((request, response, authentication) -> {
-            LoginUser loginUser = (LoginUser) authentication.getPrincipal();
-            LoginResponse resp = tokenService.issueToken(loginUser);
-            writeJson(response, Result.success(resp), HttpServletResponse.SC_OK);
-        });
-        mobileFilter.setAuthenticationFailureHandler((request, response, exception) ->
-                writeJson(response, Result.error(ResultCode.SMS_CODE_ERROR, exception.getMessage()),
-                        HttpServletResponse.SC_UNAUTHORIZED));
-
         http
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -82,9 +68,7 @@ public class SecurityConfig {
                         .accessDeniedHandler(accessDeniedHandler)
                 )
                 .authenticationProvider(daoAuthenticationProvider())
-                .authenticationProvider(mobileAuthenticationProvider)
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(mobileFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

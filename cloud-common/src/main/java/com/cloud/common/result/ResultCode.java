@@ -20,9 +20,7 @@ public enum ResultCode {
     TOKEN_INVALID(1003, "Token 无效"),
     TOKEN_EXPIRED(1004, "Token 已过期"),
     TOKEN_KICKED(1005, "Token 已失效或在别处登录"),
-    SMS_CODE_ERROR(1006, "验证码错误或已过期"),
-    SMS_CODE_RATE_LIMIT(1007, "验证码发送过于频繁"),
-    FORBIDDEN_OPERATION(1008, "无权执行该操作"),
+    FORBIDDEN_OPERATION(1006, "无权执行该操作"),
 
     // 字典管理相关错误码 (2000-2099)
     DICT_TYPE_CODE_EXISTS(2001, "字典类型编码已存在"),
