@@ -1,4 +1,4 @@
-package com.cloud.auth.feign;
+package com.cloud.file.api.feign;
 
 import feign.RequestInterceptor;
 import feign.RequestTemplate;

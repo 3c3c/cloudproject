@@ -47,8 +47,7 @@ public class FileServiceImpl implements FileService {
         try (InputStream inputStream = file.getInputStream()) {
             md5 = DigestUtil.md5Hex(inputStream);
         } catch (Exception e) {
-            throw new BusinessException(ResultCode.FILE_UPLOAD_FAILED,
-                    "Failed to calculate file MD5");
+            throw new BusinessException(ResultCode.FILE_UPLOAD_FAILED, "Failed to calculate file MD5");
         }
 
         // 3. 检查文件是否已存在（去重）

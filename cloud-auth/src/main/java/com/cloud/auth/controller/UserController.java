@@ -3,7 +3,6 @@ package com.cloud.auth.controller;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cloud.auth.dto.role.RoleResponse;
 import com.cloud.auth.dto.user.*;
-import com.cloud.auth.service.AvatarUploadService;
 import com.cloud.auth.service.RoleService;
 import com.cloud.auth.service.UserService;
 import com.cloud.common.entity.BasePage;
@@ -11,7 +10,6 @@ import com.cloud.common.result.Result;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -25,7 +23,6 @@ public class UserController {
 
     private final UserService userService;
     private final RoleService roleService;
-    private final AvatarUploadService avatarUploadService;
 
     /**
      * 根据用户名称或者账号，分页查询用户列表的功能，列表上有用户账号、用户名称、用户状态
@@ -176,21 +173,4 @@ public class UserController {
         userService.removeUserRoles(userId, roleIds);
         return Result.success(true);
     }
-
-    /**
-     * 用户上传头像接口
-     * 如果头像已经存在了，则删除以前的头像，变成用户上传的头像
-     * @param userId 用户ID
-     * @param file 头像文件
-     * @return 头像URL
-     */
-    // @PreAuthorize("hasAuthority('user:update')")
-    @PostMapping("/{userId}/avatar")
-    public Result<String> uploadAvatar(
-            @PathVariable Long userId,
-            @RequestParam("file") MultipartFile file) {
-        String avatarUrl = avatarUploadService.uploadAvatar(userId, file);
-        return Result.success(avatarUrl);
-    }
-
 }

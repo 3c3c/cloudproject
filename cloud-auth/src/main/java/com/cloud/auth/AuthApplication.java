@@ -12,7 +12,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
  */
 @SpringBootApplication(scanBasePackages = "com.cloud")
 @EnableDiscoveryClient
-@EnableFeignClients
+@EnableFeignClients(basePackages = {"com.cloud.file.api.feign"})
 @MapperScan("com.cloud.auth.mapper")
 public class AuthApplication {
 

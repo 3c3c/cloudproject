@@ -86,18 +86,6 @@
             <artifactId>hutool-all</artifactId>
         </dependency>
 
-        <!-- OpenFeign 用于服务间调用 -->
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-openfeign</artifactId>
-        </dependency>
-
-        <!-- Spring Cloud LoadBalancer -->
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-loadbalancer</artifactId>
-        </dependency>
-
         <!-- cloud-file-api -->
         <dependency>
             <groupId>com.cloud</groupId>
