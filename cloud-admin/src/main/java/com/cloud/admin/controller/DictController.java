@@ -23,18 +23,6 @@ public class DictController {
     private final DictTypeService dictTypeService;
     private final DictDataService dictDataService;
 
-
-    /**
-     * 查询所有字典类型列表
-     *
-     * @return 字典类型列表
-     */
-//    @PreAuthorize("hasAuthority('dict:query')")
-    @GetMapping("/types/all")
-    public Result<List<DictTypeResponse>> listAllTypes() {
-        return Result.success(dictTypeService.listAll());
-    }
-
     /**
      * 创建字典类型
      *

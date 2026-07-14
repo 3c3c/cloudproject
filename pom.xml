@@ -23,8 +23,6 @@
         <module>cloud-gateway</module>
         <module>cloud-auth</module>
         <module>cloud-admin</module>
-        <module>cloud-product</module>
-        <module>cloud-order</module>
         <module>cloud-file</module>
     </modules>
 

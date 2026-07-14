@@ -7,7 +7,7 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 /**
  * cloud-file 文件存储微服务启动类
  */
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = "com.cloud")
 @EnableDiscoveryClient
 public class FileApplication {
 

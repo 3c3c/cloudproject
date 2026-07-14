@@ -15,7 +15,6 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -36,7 +35,7 @@ public class FileController {
      * 单文件上传
      */
     @PostMapping("/upload")
-    @PreAuthorize("hasAuthority('file:upload')")
+//    @PreAuthorize("hasAuthority('file:upload')")
     public Result<FileResponse> upload(
             @RequestParam("file") MultipartFile file,
             @RequestParam(value = "businessType", required = false) String businessType,
@@ -50,7 +49,7 @@ public class FileController {
      * 批量文件上传
      */
     @PostMapping("/batch-upload")
-    @PreAuthorize("hasAuthority('file:upload')")
+//    @PreAuthorize("hasAuthority('file:upload')")
     public Result<List<FileResponse>> batchUpload(
             @RequestParam("files") List<MultipartFile> files,
             @RequestParam(value = "businessType", required = false) String businessType,
@@ -64,7 +63,7 @@ public class FileController {
      * 文件下载（返回文件流，用于下载）
      */
     @GetMapping("/download")
-    @PreAuthorize("hasAuthority('file:download')")
+//    @PreAuthorize("hasAuthority('file:download')")
     public ResponseEntity<Resource> download(@RequestParam("key") String fileKey) {
         try {
             FileResponse fileInfo = fileService.getFileByKey(fileKey);
@@ -86,7 +85,7 @@ public class FileController {
      * 按 fileKey 预览文件（支持直接通过URL访问图片、PDF等）
      */
     @GetMapping("/view")
-    @PreAuthorize("hasAuthority('file:preview')")
+//    @PreAuthorize("hasAuthority('file:preview')")
     public ResponseEntity<Resource> viewByKey(@RequestParam("key") String fileKey) {
         try {
             FileResponse fileInfo = fileService.getFileByKey(fileKey);
@@ -110,7 +109,7 @@ public class FileController {
      * 获取临时访问 URL
      */
     @GetMapping("/presigned-url")
-    @PreAuthorize("hasAuthority('file:preview')")
+//    @PreAuthorize("hasAuthority('file:preview')")
     public Result<String> getPresignedUrl(
             @RequestParam("key") String fileKey,
             @RequestParam(value = "expireSeconds", defaultValue = "3600") Integer expireSeconds
@@ -124,7 +123,7 @@ public class FileController {
      * 单文件删除
      */
     @DeleteMapping("/delete")
-    @PreAuthorize("hasAuthority('file:delete')")
+//    @PreAuthorize("hasAuthority('file:delete')")
     public Result<Void> delete(@RequestParam("key") String fileKey) {
         try {
             FileResponse fileInfo = fileService.getFileByKey(fileKey);
@@ -140,7 +139,7 @@ public class FileController {
      * 批量文件删除
      */
     @DeleteMapping("/batch")
-    @PreAuthorize("hasAuthority('file:delete')")
+//    @PreAuthorize("hasAuthority('file:delete')")
     public Result<BatchDeleteResult> batchDelete(@RequestBody BatchDeleteRequest request) {
         int successCount = fileService.batchDeleteFiles(request.getFileIds());
         BatchDeleteResult result = new BatchDeleteResult();
@@ -154,7 +153,7 @@ public class FileController {
      * 分页查询文件
      */
     @GetMapping("/page")
-    @PreAuthorize("hasAuthority('file:query')")
+//    @PreAuthorize("hasAuthority('file:query')")
     public Result<Page<FileResponse>> page(
             @RequestParam(value = "current", defaultValue = "1") Integer current,
             @RequestParam(value = "size", defaultValue = "10") Integer size,
@@ -168,7 +167,7 @@ public class FileController {
      * 根据 fileKey 获取文件信息
      */
     @GetMapping("/info")
-    @PreAuthorize("hasAuthority('file:query')")
+//    @PreAuthorize("hasAuthority('file:query')")
     public Result<FileResponse> getFileInfo(@RequestParam("key") String fileKey) {
         FileResponse fileInfo = fileService.getFileByKey(fileKey);
         return Result.success(fileInfo);

@@ -16,7 +16,4 @@ public final class SecurityConstants {
     public static final String HEADER_AUTHORITIES = "X-User-Authorities";
 
     public static final String AUTH_HEADER = "Authorization";
-
-    /** 角色权限前缀（Spring Security hasRole('ADMIN') 会去掉该前缀匹配） */
-    public static final String ROLE_PREFIX = "ROLE_";
 }

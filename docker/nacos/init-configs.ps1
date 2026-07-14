@@ -34,8 +34,6 @@ catch {
 $configs = @(
     @{DataId="cloud-common.yaml"; File="cloud-common.yaml"},
     @{DataId="cloud-auth.yaml"; File="cloud-auth.yaml"},
-    @{DataId="cloud-product.yaml"; File="cloud-product.yaml"},
-    @{DataId="cloud-order.yaml"; File="cloud-order.yaml"},
     @{DataId="cloud-admin.yaml"; File="cloud-admin.yaml"},
     @{DataId="cloud-gateway.yaml"; File="cloud-gateway.yaml"}
 )
@@ -104,4 +102,4 @@ foreach ($config in $configs) {
 
 Write-Host ""
 Write-Host "DONE! Open http://${NacosAddr}/nacos ($NacosUser/$NacosPassword)" -ForegroundColor Green
-Write-Host "   Published: $publishCount, Skipped: $skipCount (total 6 configurations)" -ForegroundColor Green
+Write-Host "   Published: $publishCount, Skipped: $skipCount (total 4 configurations)" -ForegroundColor Green
