@@ -5,14 +5,15 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cloud.common.exception.BusinessException;
 import com.cloud.common.result.ResultCode;
+import com.cloud.common.utils.IdUtils;
+import com.cloud.file.config.FileStorageProperties;
 import com.cloud.file.converter.FileConverter;
+import com.cloud.file.dto.response.FileResponse;
 import com.cloud.file.entity.FileInfo;
 import com.cloud.file.mapper.FileInfoMapper;
-import com.cloud.file.config.FileStorageProperties;
 import com.cloud.file.service.FileService;
-import com.cloud.file.utils.FileKeyGenerator;
 import com.cloud.file.storage.FileStorageService;
-import com.cloud.file.dto.response.FileResponse;
+import com.cloud.file.utils.FileKeyGenerator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -81,19 +82,20 @@ public class FileServiceImpl implements FileService {
 
         // 6. 保存文件信息到数据库
         FileInfo fileInfo = new FileInfo();
+        long id = IdUtils.nextId();
+        fileInfo.setId(id);
         fileInfo.setFileKey(fileKey);
         fileInfo.setOriginalFileName(file.getOriginalFilename());
         fileInfo.setFileExtension(FileKeyGenerator.getExtension(file.getOriginalFilename()));
         fileInfo.setFileSize(file.getSize());
         fileInfo.setContentType(file.getContentType());
         fileInfo.setStorageType(fileStorageService.getStorageType().getCode());
-        fileInfo.setFileUrl(buildFileUrl(fileKey));
         fileInfo.setFileMd5(md5);
         fileInfo.setBusinessType(businessType);
         fileInfo.setBusinessId(businessId);
+        fileInfo.setFileUrl(buildFileUrl(id));
 
         fileInfoMapper.insert(fileInfo);
-
         log.info("File uploaded successfully: id={}, key={}", fileInfo.getId(), fileKey);
         return fileConverter.toResponse(fileInfo);
     }
@@ -231,7 +233,7 @@ public class FileServiceImpl implements FileService {
     /**
      * 构建文件 URL
      */
-    private String buildFileUrl(String fileKey) {
-        return storageProperties.getBaseUrl() + "/file/download?key=" + fileKey;
+    private String buildFileUrl(Long id) {
+        return storageProperties.getBaseUrl() + "/file/download?id=" + id;
     }
 }

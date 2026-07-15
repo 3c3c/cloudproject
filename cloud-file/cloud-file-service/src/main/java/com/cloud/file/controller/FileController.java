@@ -64,9 +64,9 @@ public class FileController {
      */
     @GetMapping("/download")
 //    @PreAuthorize("hasAuthority('file:download')")
-    public ResponseEntity<Resource> download(@RequestParam("key") String fileKey) {
+    public ResponseEntity<Resource> download(@RequestParam("id") Long id) {
         try {
-            FileResponse fileInfo = fileService.getFileByKey(fileKey);
+            FileResponse fileInfo = fileService.getFileById(id);
             byte[] fileBytes = fileService.downloadFile(fileInfo.getId());
             ByteArrayResource resource = new ByteArrayResource(fileBytes);
             return ResponseEntity.ok()
@@ -76,19 +76,19 @@ public class FileController {
                     .contentLength(fileBytes.length)
                     .body(resource);
         } catch (Exception e) {
-            log.error("文件下载失败: key={}, error={}", fileKey, e.getMessage(), e);
+            log.error("文件下载失败: id={}, error={}", id, e.getMessage(), e);
             throw new BusinessException(ResultCode.FILE_DOWNLOAD_FAILED, "文件下载失败");
         }
     }
 
     /**
-     * 按 fileKey 预览文件（支持直接通过URL访问图片、PDF等）
+     * 按 id 预览文件（支持直接通过URL访问图片、PDF等）
      */
     @GetMapping("/view")
 //    @PreAuthorize("hasAuthority('file:preview')")
-    public ResponseEntity<Resource> viewByKey(@RequestParam("key") String fileKey) {
+    public ResponseEntity<Resource> viewById(@RequestParam("id") Long id) {
         try {
-            FileResponse fileInfo = fileService.getFileByKey(fileKey);
+            FileResponse fileInfo = fileService.getFileById(id);
             byte[] fileBytes = fileService.downloadFile(fileInfo.getId());
 
             ByteArrayResource resource = new ByteArrayResource(fileBytes);
@@ -100,7 +100,7 @@ public class FileController {
                     .cacheControl(org.springframework.http.CacheControl.maxAge(30, java.util.concurrent.TimeUnit.DAYS))
                     .body(resource);
         } catch (Exception e) {
-            log.error("文件预览失败: key={}, error={}", fileKey, e.getMessage(), e);
+            log.error("文件预览失败: id={}, error={}", id, e.getMessage(), e);
             throw new BusinessException(ResultCode.FILE_NOT_FOUND, "文件预览失败");
         }
     }
@@ -111,11 +111,10 @@ public class FileController {
     @GetMapping("/presigned-url")
 //    @PreAuthorize("hasAuthority('file:preview')")
     public Result<String> getPresignedUrl(
-            @RequestParam("key") String fileKey,
+            @RequestParam("id") Long id,
             @RequestParam(value = "expireSeconds", defaultValue = "3600") Integer expireSeconds
     ) {
-        FileResponse fileInfo = fileService.getFileByKey(fileKey);
-        String presignedUrl = fileService.getPresignedUrl(fileInfo.getId(), expireSeconds);
+        String presignedUrl = fileService.getPresignedUrl(id, expireSeconds);
         return Result.success(presignedUrl);
     }
 
@@ -124,13 +123,12 @@ public class FileController {
      */
     @DeleteMapping("/delete")
 //    @PreAuthorize("hasAuthority('file:delete')")
-    public Result<Void> delete(@RequestParam("key") String fileKey) {
+    public Result<Void> delete(@RequestParam("id") Long id) {
         try {
-            FileResponse fileInfo = fileService.getFileByKey(fileKey);
-            boolean deleted = fileService.deleteFile(fileInfo.getId());
+            boolean deleted = fileService.deleteFile(id);
             return deleted ? Result.success() : Result.error(ResultCode.FILE_DELETE_FAILED, "删除失败");
         } catch (Exception e) {
-            log.error("文件删除失败: key={}, error={}", fileKey, e.getMessage(), e);
+            log.error("文件删除失败: id={}, error={}", id, e.getMessage(), e);
             throw new BusinessException(ResultCode.FILE_DELETE_FAILED, "文件删除失败");
         }
     }
@@ -164,12 +162,12 @@ public class FileController {
     }
 
     /**
-     * 根据 fileKey 获取文件信息
+     * 根据 id 获取文件信息
      */
     @GetMapping("/info")
 //    @PreAuthorize("hasAuthority('file:query')")
-    public Result<FileResponse> getFileInfo(@RequestParam("key") String fileKey) {
-        FileResponse fileInfo = fileService.getFileByKey(fileKey);
+    public Result<FileResponse> getFileInfo(@RequestParam("id") Long id) {
+        FileResponse fileInfo = fileService.getFileById(id);
         return Result.success(fileInfo);
     }
 }
