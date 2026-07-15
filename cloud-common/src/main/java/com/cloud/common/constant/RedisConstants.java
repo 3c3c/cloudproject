@@ -18,6 +18,7 @@ public final class RedisConstants {
     }
 
     public static final String LOGIN_TOKEN_PREFIX = "login:token:";
+    public static final String USER_PERMISSION_PREFIX = "user:permission:";
     public static final String BLACKLIST_PREFIX = "blacklist:";
     public static final String SMS_CODE_PREFIX = "sms:code:";
     public static final String SMS_RATE_PREFIX = "sms:rate:";
@@ -32,6 +33,10 @@ public final class RedisConstants {
 
     public static String loginTokenKey(String username) {
         return LOGIN_TOKEN_PREFIX + username;
+    }
+
+    public static String userPermissionKey(String username) {
+        return USER_PERMISSION_PREFIX + username;
     }
 
     public static String blacklistKey(String token) {

@@ -63,6 +63,8 @@ public class AuthServiceImpl implements AuthService {
         Claims claims = jwtUtils.getClaimsFromToken(token);
         String username = claims.getSubject();
         redisTemplate.delete(RedisConstants.loginTokenKey(username));
+        // 删除用户权限缓存
+        redisTemplate.delete(RedisConstants.userPermissionKey(username));
         // 加入黑名单，防止该 token 在剩余有效期内继续使用
         long ttl = claims.getExpiration().getTime() - System.currentTimeMillis();
         if (ttl > 0) {

@@ -12,8 +12,6 @@ public final class SecurityConstants {
     public static final String HEADER_USER_ID = "X-User-Id";
     /** 请求头：用户名 */
     public static final String HEADER_USERNAME = "X-Username";
-    /** 请求头：权限集合（逗号分隔） */
-    public static final String HEADER_AUTHORITIES = "X-User-Authorities";
 
     public static final String AUTH_HEADER = "Authorization";
 }

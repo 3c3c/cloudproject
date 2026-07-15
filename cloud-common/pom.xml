@@ -48,6 +48,13 @@
             <scope>provided</scope>
         </dependency>
 
+        <!-- Redis 仅编译期需要，运行期由具体服务提供 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
         <!-- MyBatis Plus 仅编译期需要，运行期由具体服务提供 -->
         <dependency>
             <groupId>com.baomidou</groupId>

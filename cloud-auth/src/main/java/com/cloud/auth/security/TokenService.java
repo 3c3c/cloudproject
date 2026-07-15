@@ -56,6 +56,17 @@ public class TokenService {
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList());
 
+        // 将用户拥有的权限记录到缓存中，登出的时候删除缓存的用户权限
+        if (!authorities.isEmpty()) {
+            redisTemplate.opsForValue().set(
+                    RedisConstants.userPermissionKey(loginUser.getUsername()),
+                    String.join(",", authorities),
+                    jwtUtils.getExpiration(),
+                    TimeUnit.MILLISECONDS
+            );
+        }
+
+
         // 获取用户的菜单树（包含目录和菜单，不包含按钮）
         List<PermissionTreeResponse> menuTree = buildUserMenuTree(loginUser.getUserId());
 

@@ -1,10 +1,12 @@
 package com.cloud.common.web;
 
+import com.cloud.common.constant.RedisConstants;
 import com.cloud.common.constant.SecurityConstants;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -25,15 +27,23 @@ import java.util.stream.Collectors;
  */
 public class UserContextFilter extends OncePerRequestFilter {
 
+    private final StringRedisTemplate redisTemplate;
+
+    public UserContextFilter(StringRedisTemplate redisTemplate) {
+        this.redisTemplate = redisTemplate;
+    }
+
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain chain) throws ServletException, IOException {
         String userId = request.getHeader(SecurityConstants.HEADER_USER_ID);
         String username = request.getHeader(SecurityConstants.HEADER_USERNAME);
-        String authorities = request.getHeader(SecurityConstants.HEADER_AUTHORITIES);
 
         if (StringUtils.hasText(username)) {
+            // 从Redis中获取用户权限缓存
+            String authorities = redisTemplate.opsForValue().get(RedisConstants.userPermissionKey(username));
+
             List<SimpleGrantedAuthority> authorityList = StringUtils.hasText(authorities)
                     ? Arrays.stream(authorities.split(","))
                         .filter(StringUtils::hasText)

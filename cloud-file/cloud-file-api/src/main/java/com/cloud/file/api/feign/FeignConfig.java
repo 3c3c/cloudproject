@@ -29,7 +29,6 @@ public class FeignConfig {
         copyHeader(request, template, "Authorization");
         copyHeader(request, template, "X-User-Id");
         copyHeader(request, template, "X-Username");
-        copyHeader(request, template, "X-User-Authorities");
     }
 
     private void copyHeader(HttpServletRequest request, RequestTemplate template, String name) {
