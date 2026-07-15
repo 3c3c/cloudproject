@@ -41,7 +41,6 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
 
     public static final String HEADER_USER_ID = "X-User-Id";
     public static final String HEADER_USERNAME = "X-Username";
-    public static final String HEADER_AUTHORITIES = "X-User-Authorities";
 
     private static final String AUTH_HEADER = "Authorization";
     private static final String BEARER_PREFIX = "Bearer ";
@@ -87,18 +86,15 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
             }
             Object userId = claims.get("userId");
             String username = claims.getSubject();
-            String authorities = claims.get("authorities", String.class);
 
             // 先移除客户端可能伪造的 X-User-* 头，再由网关写入可信值
             ServerHttpRequest mutated = request.mutate()
                     .headers(h -> {
                         h.remove(HEADER_USER_ID);
                         h.remove(HEADER_USERNAME);
-                        h.remove(HEADER_AUTHORITIES);
                     })
                     .header(HEADER_USER_ID, userId == null ? "" : String.valueOf(userId))
                     .header(HEADER_USERNAME, username == null ? "" : username)
-                    .header(HEADER_AUTHORITIES, authorities == null ? "" : authorities)
                     .build();
             return chain.filter(exchange.mutate().request(mutated).build());
         });
