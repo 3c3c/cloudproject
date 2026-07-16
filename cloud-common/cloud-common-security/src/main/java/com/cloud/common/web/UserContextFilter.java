@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * 业务服务公共过滤器：解析网关透传的 X-User-* 请求头，构建认证上下文（aaa.md 网关方案二）。
+ * 业务服务公共过滤器：解析网关透传的 X-User-* 请求头，构建认证上下文
  * <p>
  * 本类不标注 @Component，由各业务服务的 {@code SecurityConfig} 显式注册到过滤器链，
  * 以保证过滤器顺序可控。
