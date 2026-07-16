@@ -16,10 +16,10 @@
     <description>文件服务 API 模块：Feign 客户端接口和 DTO 对象</description>
 
     <dependencies>
-        <!-- cloud-common -->
+        <!-- cloud-common-core -->
         <dependency>
             <groupId>com.cloud</groupId>
-            <artifactId>cloud-common</artifactId>
+            <artifactId>cloud-common-core</artifactId>
         </dependency>
 
         <!-- Spring Cloud OpenFeign -->

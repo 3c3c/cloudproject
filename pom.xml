@@ -24,6 +24,7 @@
         <module>cloud-auth</module>
         <module>cloud-admin</module>
         <module>cloud-file</module>
+        <module>cloud-message</module>
     </modules>
 
     <properties>
@@ -43,6 +44,7 @@
         <hutool.version>5.8.25</hutool.version>
         <minio.version>8.5.7</minio.version>
         <aliyun-oss.version>3.17.4</aliyun-oss.version>
+        <spring-kafka.version>3.1.1</spring-kafka.version>
     </properties>
 
     <dependencyManagement>
@@ -119,16 +121,34 @@
                 <artifactId>aliyun-sdk-oss</artifactId>
                 <version>${aliyun-oss.version}</version>
             </dependency>
-            <!-- 内部公共模块 -->
+            <!-- Spring Kafka -->
+            <dependency>
+                <groupId>org.springframework.kafka</groupId>
+                <artifactId>spring-kafka</artifactId>
+                <version>${spring-kafka.version}</version>
+            </dependency>
+            <!-- 内部公共基础模块（纯净） -->
             <dependency>
                 <groupId>com.cloud</groupId>
-                <artifactId>cloud-common</artifactId>
+                <artifactId>cloud-common-core</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <!-- 公共安全模块（可选，承载 Spring Security/JWT/Redis 耦合组件） -->
+            <dependency>
+                <groupId>com.cloud</groupId>
+                <artifactId>cloud-common-security</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <!-- 文件服务 API 模块 -->
             <dependency>
                 <groupId>com.cloud</groupId>
                 <artifactId>cloud-file-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <!-- 消息服务 API 模块 -->
+            <dependency>
+                <groupId>com.cloud</groupId>
+                <artifactId>cloud-message-api</artifactId>
                 <version>${project.version}</version>
             </dependency>
         </dependencies>

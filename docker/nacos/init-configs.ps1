@@ -31,31 +31,41 @@ catch {
     exit 1
 }
 
+# 本地 configs/ 下需发布到 Nacos 的配置清单
 $configs = @(
     @{DataId="cloud-common.yaml"; File="cloud-common.yaml"},
     @{DataId="cloud-auth.yaml"; File="cloud-auth.yaml"},
     @{DataId="cloud-admin.yaml"; File="cloud-admin.yaml"},
-    @{DataId="cloud-gateway.yaml"; File="cloud-gateway.yaml"}
+    @{DataId="cloud-gateway.yaml"; File="cloud-gateway.yaml"},
+    @{DataId="cloud-message.yaml"; File="cloud-message.yaml"}
 )
 
-$skipCount = 0
-$publishCount = 0
+$publishUrl = "http://" + $NacosAddr + "/nacos/v1/cs/configs"
+$createCount = 0      # 新建数
+$updateCount = 0      # 更新数
+$skipCount = 0        # 跳过数
+$failCount = 0        # 失败数
 
 foreach ($config in $configs) {
     $FilePath = Join-Path $ConfigsDir $config.File
 
     if (-not (Test-Path $FilePath)) {
-        Write-Host "   WARNING: File not found: $FilePath, skipping" -ForegroundColor Yellow
+        Write-Host "   WARNING: Local file not found: $FilePath, skipping" -ForegroundColor Yellow
         continue
     }
 
+    $DataId = $config.DataId
+
     try {
         $Content = Get-Content $FilePath -Raw -Encoding UTF8
+        # 去掉 UTF-8 BOM（若有），否则与 Nacos 返回内容比较时永远不一致，反复触发无谓的更新
+        $Bom = [char]0xFEFF
+        $Content = $Content -replace "^$Bom", ""
 
-        # Check if config already exists in Nacos
+        # 查询 Nacos 是否已存在该配置
         $GetConfigUrl = "http://" + $NacosAddr + "/nacos/v1/cs/configs"
         $getConfigParams = @{
-            dataId = $config.DataId
+            dataId = $DataId
             group = $Group
             tenant = $Namespace
             accessToken = $Token
@@ -66,40 +76,66 @@ foreach ($config in $configs) {
             $existingConfig = Invoke-RestMethod -Uri $GetConfigUrl -Method GET -Body $getConfigParams
         }
         catch {
-            # Config doesn't exist yet, that's okay
+            # 配置不存在（Nacos 返回 404），正常情况，按新建处理
             $existingConfig = $null
         }
 
-        # Skip if config exists and content is same
-        if ($existingConfig -and $existingConfig.Trim() -eq $Content.Trim()) {
-            Write-Host "==> $($config.DataId) ... " -ForegroundColor Cyan -NoNewline
+        $exists = ($null -ne $existingConfig -and -not [string]::IsNullOrWhiteSpace($existingConfig))
+        $same = ($exists -and $existingConfig.Trim() -eq $Content.Trim())
+
+        if ($same) {
+            # 本地与远端一致，无需操作
+            Write-Host "==> $DataId ... " -ForegroundColor Cyan -NoNewline
             Write-Host "SKIP (local and remote are the same)" -ForegroundColor Gray
             $skipCount++
+            continue
         }
-        else {
-            # Pull config from Nacos to update local file
-            if ($existingConfig) {
-                Write-Host "==> $($config.DataId) ... " -ForegroundColor Cyan -NoNewline
-                Write-Host "SYNC (remote differs from local, pulling from Nacos)" -ForegroundColor Yellow
 
-                # Update local file with config from Nacos
-                $existingConfig | Out-File -FilePath $FilePath -Encoding UTF8 -NoNewline
+        # 发布配置到 Nacos（新建或更新走同一个 POST /nacos/v1/cs/configs 接口）
+        # 用 application/x-www-form-urlencoded 提交，content 经 EscapeDataString 编码以处理特殊字符（=、&、换行）
+        # 鉴权：accessToken 与 username 都放 body。前提是配置的 createBy/owner 为当前用户（首次发布即写入）；
+        #       若配置是无主历史数据（createBy 为空），update 会报 "user not found!"(403)，需先删除重建。
+        $formFields = @(
+            "dataId=" + [System.Uri]::EscapeDataString($DataId),
+            "group="   + [System.Uri]::EscapeDataString($Group),
+            "type=yaml",
+            "accessToken=" + [System.Uri]::EscapeDataString($Token),
+            "username="    + [System.Uri]::EscapeDataString($NacosUser),
+            "content=" + [System.Uri]::EscapeDataString($Content)
+        )
+        if (-not [string]::IsNullOrEmpty($Namespace)) {
+            $formFields = @("tenant=" + [System.Uri]::EscapeDataString($Namespace)) + $formFields
+        }
+        $Body = [string]::Join("&", $formFields)
 
-                Write-Host "      Local file updated: $FilePath" -ForegroundColor Green
-                $publishCount++
+        $publishResponse = Invoke-RestMethod -Uri $publishUrl -Method POST -Body $Body `
+            -ContentType "application/x-www-form-urlencoded; charset=UTF-8"
+
+        if ($publishResponse -eq $true) {
+            if ($exists) {
+                Write-Host "==> $DataId ... " -ForegroundColor Cyan -NoNewline
+                Write-Host "UPDATE (remote differs from local, published local to Nacos)" -ForegroundColor Yellow
+                $updateCount++
             }
             else {
-                Write-Host "==> $($config.DataId) ... " -ForegroundColor Cyan -NoNewline
-                Write-Host "WARNING (config not found in Nacos, skipping)" -ForegroundColor Yellow
+                Write-Host "==> $DataId ... " -ForegroundColor Cyan -NoNewline
+                Write-Host "CREATE (new config published to Nacos)" -ForegroundColor Green
+                $createCount++
             }
+        }
+        else {
+            Write-Host "==> $DataId ... " -ForegroundColor Cyan -NoNewline
+            Write-Host " FAILED (Nacos rejected the publish: $publishResponse)" -ForegroundColor Red
+            $failCount++
         }
     }
     catch {
-        Write-Host "==> $($config.DataId) ... " -ForegroundColor Cyan -NoNewline
+        Write-Host "==> $DataId ... " -ForegroundColor Cyan -NoNewline
         Write-Host " FAILED: $($_.Exception.Message)" -ForegroundColor Red
+        $failCount++
     }
 }
 
 Write-Host ""
 Write-Host "DONE! Open http://${NacosAddr}/nacos ($NacosUser/$NacosPassword)" -ForegroundColor Green
-Write-Host "   Published: $publishCount, Skipped: $skipCount (total 4 configurations)" -ForegroundColor Green
+Write-Host "   Created: $createCount, Updated: $updateCount, Skipped: $skipCount, Failed: $failCount (total $($configs.Count) configurations)" -ForegroundColor Green

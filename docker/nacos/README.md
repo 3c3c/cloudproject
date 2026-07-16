@@ -7,12 +7,13 @@
 ```
 docker/nacos/
 ├── docker-compose.yml        # Nacos + MySQL + Redis 一键启动
-├── init-configs.sh           # 把 configs/ 下配置一键导入 Nacos
-└── configs/                  # 各项目在 Nacos 上的配置（参考/导入源）
+├── init-configs.ps1          # 把 configs/ 下配置一键发布到 Nacos（PowerShell 版）
+├── init-configs.bat          # Windows 批处理入口（内部调用上面的 ps1）
+└── configs/                  # 各项目在 Nacos 上的配置（导入源）
     ├── cloud-common.yaml     # 共享：Redis / JWT / MyBatis-Plus / 日志
     ├── cloud-auth.yaml       # auth 私有：数据源 + 建表
-    ├── cloud-product.yaml    # product 私有：数据源
-    ├── cloud-order.yaml      # order 私有：数据源 + Feign 日志
+    ├── cloud-admin.yaml      # admin 私有：数据源
+    ├── cloud-message.yaml    # message 私有：数据源 + Kafka + 邮件 + 模板
     └── cloud-gateway.yaml    # gateway 私有：路由 + 白名单
 ```
 
@@ -34,16 +35,24 @@ docker compose -f docker/nacos/docker-compose.yml up -d
 
 > 等待 Nacos 就绪（看到日志 `Nacos started successfully`），约 20~30 秒。
 
-### 2. 把配置导入 Nacos
+### 2. 把配置发布到 Nacos
 
 ```bash
-bash docker/nacos/init-configs.sh
+# Windows（Git Bash / CMD / PowerShell 均可）
+docker/nacos/init-configs.bat
+# 或直接调用 PowerShell 脚本
+powershell -ExecutionPolicy Bypass -File docker/nacos/init-configs.ps1
 ```
 
 脚本会登录 Nacos、把 `configs/` 下 5 个 yaml 发布到 **public** 命名空间、`DEFAULT_GROUP`。
+- **Nacos 中不存在** → 自动 **创建**；
+- **Nacos 中已存在但内容不同** → 用本地文件 **覆盖更新**；
+- **内容完全一致** → **跳过**。
+
 完成后可在控制台「配置管理 → 配置列表」看到它们。
 
 > 该脚本是为了免去手动逐条粘贴；你也可以在控制台手动新建（dataId/group/内容与 `configs/` 文件一一对应）。
+> 通过 `NACOS_NS` 环境变量可指定其它命名空间（留空即 public）。
 
 ### 3. 启动各服务
 
@@ -77,4 +86,4 @@ bash docker/nacos/init-configs.sh
 
 - 想改某服务的数据库/路由/白名单 → 改对应 `configs/<服务名>.yaml`，导入到 Nacos（或在控制台直接编辑，Nacos 支持热更新）。
 - 想改 Redis/JWT/MyBatis 等公共项 → 改 `configs/cloud-common.yaml`。
-- 改完 `configs/` 文件后重新跑 `init-configs.sh` 即可覆盖更新。
+- 改完 `configs/` 文件后重新跑 `init-configs.bat` 即可覆盖更新。

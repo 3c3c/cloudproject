@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: cloud-message-service
+  cloud:
+    nacos:
+      server-addr: ${NACOS_ADDR:127.0.0.1:8848}
+      namespace: ${NACOS_NS:}        # 留空 = Nacos 的 public 命名空间；自定义则填「命名空间 ID」
+      username: ${NACOS_USER:nacos}
+      password: ${NACOS_PASSWORD:nacos}
+    discovery:
+      enabled: true
+      server-addr: ${NACOS_ADDR:127.0.0.1:8848}
+  config:
+    import:
+      - optional:nacos:cloud-common.yaml
+      - optional:nacos:cloud-message.yaml
+  kafka:
+    bootstrap-servers: ${KAFKA_ADDR:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      acks: 1
+      retries: 3

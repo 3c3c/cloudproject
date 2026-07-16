@@ -17,20 +17,12 @@
     <dependencies>
         <dependency>
             <groupId>com.cloud</groupId>
-            <artifactId>cloud-common</artifactId>
+            <artifactId>cloud-common-security</artifactId>
         </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-security</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-redis</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -80,6 +72,13 @@
         <dependency>
             <groupId>com.cloud</groupId>
             <artifactId>cloud-file-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <!-- cloud-message-api（Kafka 消息发送） -->
+        <dependency>
+            <groupId>com.cloud</groupId>
+            <artifactId>cloud-message-api</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

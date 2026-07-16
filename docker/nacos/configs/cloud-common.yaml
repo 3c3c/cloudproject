@@ -1,9 +1,3 @@
-# =====================================================================
-# 共享配置 cloud-common.yaml（group: DEFAULT_GROUP, namespace: public）
-# 被所有服务通过 spring.config.import 引入。
-# 内含跨服务复用的中间件与公共参数；本服务私有配置在 <服务名>.yaml 中。
-# =====================================================================
-
 # ===== 公共中间件：Redis（auth、gateway 使用；其余服务无 redis starter 自动忽略）=====
 spring:
   data:
@@ -29,6 +23,14 @@ mybatis-plus:
   global-config:
     db-config:
       id-type: auto
+
+# Feign 配置
+feign:
+  client:
+    config:
+      default:
+        connectTimeout: 5000
+        readTimeout: 5000
 
 # ===== 日志 =====
 logging:

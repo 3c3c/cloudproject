@@ -3,10 +3,7 @@ package com.cloud.common.exception;
 import com.cloud.common.result.Result;
 import com.cloud.common.result.ResultCode;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
-import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -15,7 +12,12 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 /**
- * 全局异常处理（统一返回 JSON）
+ * 全局异常处理（统一返回 JSON）。
+ *
+ * <p>本类不依赖 Spring Security。认证/鉴权异常
+ * （{@code AuthenticationException} / {@code AccessDeniedException}）的处理
+ * 由 {@code cloud-common-security} 模块中的 {@code SecurityExceptionHandler} 提供，
+ * 仅当应用依赖了 security 模块时才激活，避免纯净服务被强制要求 security。</p>
  */
 @Slf4j
 @RestControllerAdvice
@@ -25,22 +27,6 @@ public class GlobalExceptionHandler {
     public Result<Void> handleBusiness(BusinessException e) {
         log.warn("业务异常: code={}, msg={}", e.getCode(), e.getMessage());
         return Result.error(e.getCode(), e.getMessage());
-    }
-
-    /** 认证异常：未登录 / token 失效 */
-    @ExceptionHandler(AuthenticationException.class)
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    public Result<Void> handleAuthentication(AuthenticationException e) {
-        log.warn("认证异常: {}", e.getMessage());
-        return Result.error(ResultCode.UNAUTHORIZED, e.getMessage());
-    }
-
-    /** 权限不足 */
-    @ExceptionHandler(AccessDeniedException.class)
-    @ResponseStatus(HttpStatus.FORBIDDEN)
-    public Result<Void> handleAccessDenied(AccessDeniedException e) {
-        log.warn("权限不足: {}", e.getMessage());
-        return Result.error(ResultCode.FORBIDDEN);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -63,7 +49,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(Exception.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseStatus(org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR)
     public Result<Void> handleException(Exception e) {
         log.error("系统异常", e);
         return Result.error(ResultCode.INTERNAL_ERROR, e.getMessage());

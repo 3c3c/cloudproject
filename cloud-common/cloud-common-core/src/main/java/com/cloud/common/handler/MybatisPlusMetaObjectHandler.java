@@ -1,17 +1,24 @@
 package com.cloud.common.handler;
 
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
-import com.cloud.common.security.SecurityUtils;
+import lombok.RequiredArgsConstructor;
 import org.apache.ibatis.reflection.MetaObject;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 
 /**
- * MyBatis Plus 元数据处理器，用于自动填充审计字段
+ * MyBatis Plus 元数据处理器，用于自动填充审计字段。
+ *
+ * <p>当前操作人通过 {@link CurrentUserProvider} SPI 获取，不直接依赖 Spring Security。
+ * 需要鉴权的服务依赖 cloud-common-security 后，其 {@code SecurityCurrentUserProvider}
+ * 会覆盖默认实现，自动填充真实登录用户。</p>
  */
 @Component
+@RequiredArgsConstructor
 public class MybatisPlusMetaObjectHandler implements MetaObjectHandler {
+
+    private final CurrentUserProvider currentUserProvider;
 
     @Override
     public void insertFill(MetaObject metaObject) {
@@ -36,13 +43,13 @@ public class MybatisPlusMetaObjectHandler implements MetaObjectHandler {
     }
 
     /**
-     * 获取当前登录用户名
+     * 获取当前登录用户名，无法获取时回退为 "system"。
      */
     private String getCurrentUsername() {
         try {
-            return SecurityUtils.getCurrentUsername();
+            String username = currentUserProvider.getCurrentUsername();
+            return username != null ? username : "system";
         } catch (Exception e) {
-            // 如果无法获取当前用户，使用默认值
             return "system";
         }
     }

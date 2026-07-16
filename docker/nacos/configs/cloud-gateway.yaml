@@ -19,20 +19,37 @@ spring:
           uri: lb://cloud-auth
           predicates:
             - Path=/auth/**
-        - id: cloud-product
-          uri: lb://cloud-product
+        - id: cloud-admin
+          uri: lb://cloud-admin
           predicates:
-            - Path=/products/**
-        - id: cloud-order
-          uri: lb://cloud-order
+            - Path=/admin/**
+        - id: cloud-file
+          uri: lb://cloud-file
           predicates:
-            - Path=/orders/**
+            - Path=/file/**
 
 # 网关白名单：以下路径不校验 token
 gateway:
+  cors:
+    # 允许的源（可通过环境变量覆盖）
+    allowed-origins:
+      - "${CORS_ALLOWED_ORIGIN_1:http://localhost:3000}"
+    # 允许的 HTTP 方法 OPTIONS必需：CORS 预检
+    allowed-methods:
+      - GET
+      - POST
+      - PUT
+      - DELETE
+      - OPTIONS
+    # 暴露的响应头
+    exposed-headers:
+      - Content-Disposition
+      - Authorization
   white-list:
     - /auth/login
     - /auth/register
+    - /auth/public-key
     - /auth/sms/send
     - /auth/sms/login
     - /actuator
+    - /file/download

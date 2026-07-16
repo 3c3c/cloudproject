@@ -12,6 +12,13 @@ spring:
     import:
       - optional:nacos:cloud-common.yaml
       - optional:nacos:cloud-auth.yaml
+  kafka:
+    bootstrap-servers: ${KAFKA_ADDR:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      acks: 1
+      retries: 3
 
 # 文件服务配置
 cloud:
