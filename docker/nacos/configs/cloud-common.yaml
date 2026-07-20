@@ -8,8 +8,11 @@ spring:
       database: 0
 
 # ===== JWT：auth 与 gateway 必须使用同一套，否则验签失败 =====
+# 注意：下面的默认值仅用于本地开发。JwtProperties 启动时会 fail-fast 校验：
+#   - 空值 / 公开占位符 / 长度 < 32 字节 都会拒绝启动。
+# 生产环境务必通过环境变量 JWT_SECRET 注入一个强随机密钥（>=32 字节），覆盖此默认值。
 jwt:
-  secret: ${JWT_SECRET:cloud-project-default-secret-key-please-change-in-nacos-32bytes}
+  secret: ${JWT_SECRET:dev-only-jwt-secret-do-not-use-in-prod-0123456789abcdef}
   expiration: 7200000          # 2 小时（毫秒）
   header: Authorization
   token-prefix: "Bearer "

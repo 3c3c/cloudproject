@@ -1,7 +1,6 @@
 package com.cloud.message.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.cloud.common.result.ResultCode;
 import com.cloud.message.api.dto.MessageSendRequest;
 import com.cloud.message.api.enums.MessageStatus;
 import com.cloud.message.api.enums.MessageType;
@@ -47,7 +46,6 @@ public class MessageServiceImpl implements MessageService {
 
     /**
      * 所有消息发送器实现
-     * 注意：不能直接 @Autowired Map<MessageType, MessageSender>，
      * Spring 只支持以 String（bean 名）作为 Map 的 key 注入，
      * 用枚举作 key 会得到空 Map。这里注入 List 后在 @PostConstruct 中按 getType() 组装。
      */

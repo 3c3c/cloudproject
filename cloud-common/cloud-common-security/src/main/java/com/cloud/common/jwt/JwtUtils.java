@@ -95,12 +95,14 @@ public class JwtUtils {
                 .collect(Collectors.toList());
     }
 
-    /** 从 Authorization 头中提取纯 token */
+    /**
+     * 从 Authorization 头中提取纯 token。
+     */
     public String extractToken(String bearerToken) {
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(properties.getTokenPrefix())) {
             return bearerToken.substring(properties.getTokenPrefix().length());
         }
-        return bearerToken;
+        return null;
     }
 
     public String getHeader() {

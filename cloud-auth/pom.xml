@@ -68,13 +68,6 @@
             <artifactId>mapstruct</artifactId>
         </dependency>
 
-        <!-- cloud-file-api -->
-        <dependency>
-            <groupId>com.cloud</groupId>
-            <artifactId>cloud-file-api</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
         <!-- cloud-message-api（Kafka 消息发送） -->
         <dependency>
             <groupId>com.cloud</groupId>

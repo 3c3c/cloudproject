@@ -1,4 +1,4 @@
-package com.cloud.message.api.kafka;
+package com.cloud.message.kafka;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +18,7 @@ import java.util.concurrent.CompletableFuture;
  */
 @Slf4j
 @Component
-public class KafkaProducer {
+public class MessageProducer {
 
     @Autowired
     private KafkaTemplate<String, String> kafkaTemplate;

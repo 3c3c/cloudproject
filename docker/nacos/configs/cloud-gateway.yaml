@@ -49,7 +49,5 @@ gateway:
     - /auth/login
     - /auth/register
     - /auth/public-key
-    - /auth/sms/send
-    - /auth/sms/login
     - /actuator
     - /file/download

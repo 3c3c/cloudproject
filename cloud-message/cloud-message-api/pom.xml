@@ -34,12 +34,6 @@
             <artifactId>spring-cloud-starter-loadbalancer</artifactId>
         </dependency>
 
-        <!-- Spring Kafka（生产者） -->
-        <dependency>
-            <groupId>org.springframework.kafka</groupId>
-            <artifactId>spring-kafka</artifactId>
-        </dependency>
-
         <!-- Spring Boot Web (用于注解如 @RequestMapping 等) -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

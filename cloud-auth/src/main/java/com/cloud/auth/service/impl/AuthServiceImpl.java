@@ -60,6 +60,10 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public void logout(String bearerToken) {
         String token = jwtUtils.extractToken(bearerToken);
+        if (token == null) {
+            throw new com.cloud.common.exception.BusinessException(
+                com.cloud.common.result.ResultCode.UNAUTHORIZED, "未携带合法的 token");
+        }
         Claims claims = jwtUtils.getClaimsFromToken(token);
         String username = claims.getSubject();
         redisTemplate.delete(RedisConstants.loginTokenKey(username));
