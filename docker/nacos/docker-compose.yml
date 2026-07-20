@@ -1,11 +1,13 @@
 # =====================================================================
-# 开发环境一键启动：Nacos 配置中心/注册中心 + MySQL + Redis + MinIO
+# 开发环境一键启动：Nacos 配置中心/注册中心 + MySQL + Redis + MinIO + Kafka
 # Nacos 版本 v2.3.2，配套 Spring Cloud Alibaba 2023.0.1.0（自带 Nacos Client 2.3.2）
+# Kafka 采用 KRaft 模式（无需 Zookeeper），供 cloud-message 服务异步消费消息。
 #
 #   启动： docker compose -f docker/nacos/docker-compose.yml up -d
 #   导配置：bash docker/nacos/init-configs.sh
 #   控制台：http://localhost:8848/nacos  （账号/密码：nacos / nacos）
 #   MinIO： http://localhost:9001  （账号/密码：minioadmin / minioadmin）
+#   Kafka： localhost:9092（PLAINTEXT，topic 自动创建）
 #   停止： docker compose -f docker/nacos/docker-compose.yml down
 # =====================================================================
 services:
@@ -75,8 +77,51 @@ services:
       timeout: 20s
       retries: 3
 
+  # Kafka（KRaft 模式，无需 Zookeeper）
+  # 供 cloud-message 服务异步消费消息。客户端默认连 localhost:9092。
+  kafka:
+    image: bitnami/kafka:3.7
+    container_name: cloud-kafka
+    environment:
+      # ===== KRaft 共识配置（单节点）=====
+      KAFKA_CFG_NODE_ID: "0"
+      KAFKA_CFG_PROCESS_ROLES: "controller,broker"
+      KAFKA_CFG_CONTROLLER_QUORUM_VOTERS: "0@kafka:9093"
+      KAFKA_CFG_CONTROLLER_LISTENER_NAMES: "CONTROLLER"
+      # ===== 监听器 =====
+      # INTERNAL：容器内部 / 其它 compose 服务通过服务名 kafka 访问
+      # PLAINTEXT：宿主机与各微服务通过 localhost:9092 访问（开发用，无鉴权）
+      KAFKA_CFG_LISTENERS: "PLAINTEXT://:9092,CONTROLLER://:9093"
+      KAFKA_CFG_ADVERTISED_LISTENERS: "PLAINTEXT://localhost:9092"
+      KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: "CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT"
+      KAFKA_CFG_INTER_BROKER_LISTENER_NAME: "PLAINTEXT"
+      # ===== 开发环境友好项 =====
+      # 允许客户端首次发消息/订阅时自动创建 topic（cloud-message-send 等）
+      KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE: "true"
+      # 单节点下默认副本数与最小同步副本都设为 1，避免生产者 acks/请求报错
+      KAFKA_CFG_OFFSETS_TOPIC_REPLICATION_FACTOR: "1"
+      KAFKA_CFG_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: "1"
+      KAFKA_CFG_TRANSACTION_STATE_LOG_MIN_ISR: "1"
+      KAFKA_CFG_NUM_PARTITIONS: "3"
+      # 允许删除 topic（开发调试用）
+      KAFKA_CFG_DELETE_TOPIC_ENABLE: "true"
+      # bitnami 镜像每次启动会清理 KRaft 日志重新格式化，保证单机开发可重复启动
+      KAFKA_KRAFT_CLUSTER_ID: "cloud-project-dev-cluster"
+    ports:
+      - "9092:9092"
+    volumes:
+      - kafka-data:/bitnami/kafka
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "kafka-topics.sh --bootstrap-server localhost:9092 --list >/dev/null 2>&1"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
+
 volumes:
   nacos-logs:
   mysql-data:
   redis-data:
   minio-data:
+  kafka-data:

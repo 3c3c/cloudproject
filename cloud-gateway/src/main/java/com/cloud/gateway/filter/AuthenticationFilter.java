@@ -1,5 +1,6 @@
 package com.cloud.gateway.filter;
 
+import com.cloud.gateway.constant.RedisKeys;
 import com.cloud.gateway.properties.GatewayWhiteListProperties;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -32,7 +33,8 @@ import java.util.Map;
  * 1) 白名单放行
  * 2) 解析 Authorization: Bearer xxx，验签 + 有效期
  * 3) Redis 黑名单校验（响应式）
- * 4) 解析 userId / username / authorities，写入 X-User-* 头透传下游
+ * 4) Redis 单点登录校验：login:token:{username} 必须存在且等于当前 token（强制下线 / SSO 真正在网关层生效）
+ * 5) 解析 userId / username / authorities，写入 X-User-* 头透传下游
  */
 @Slf4j
 @Component
@@ -79,24 +81,34 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
             return unauthorized(exchange, "Token 无效或已过期");
         }
 
-        // 黑名单校验（响应式）
-        return redisTemplate.hasKey("blacklist:" + token).flatMap(black -> {
+        final String username = claims.getSubject();
+
+        // 黑名单校验（响应式）—— 命中则直接 401
+        return redisTemplate.hasKey(RedisKeys.blacklistKey(token)).flatMap(black -> {
             if (Boolean.TRUE.equals(black)) {
                 return unauthorized(exchange, "Token 已失效");
             }
-            Object userId = claims.get("userId");
-            String username = claims.getSubject();
-
-            // 先移除客户端可能伪造的 X-User-* 头，再由网关写入可信值
-            ServerHttpRequest mutated = request.mutate()
-                    .headers(h -> {
-                        h.remove(HEADER_USER_ID);
-                        h.remove(HEADER_USERNAME);
-                    })
-                    .header(HEADER_USER_ID, userId == null ? "" : String.valueOf(userId))
-                    .header(HEADER_USERNAME, username == null ? "" : username)
-                    .build();
-            return chain.filter(exchange.mutate().request(mutated).build());
+            // 单点登录校验：login:token:{username} 必须存在且等于当前 token。
+            // 与 cloud-auth 的 JwtAuthenticationFilter 语义一致：新登录会覆盖该 key，旧 token 即被踢下线；
+            // 登出会删除该 key。此前网关不校验，导致已踢下线/已登出的 token 在过期前仍可访问下游服务。
+            return redisTemplate.opsForValue().get(RedisKeys.loginTokenKey(username))
+                    .defaultIfEmpty("")
+                    .flatMap(stored -> {
+                        if (!token.equals(stored)) {
+                            return unauthorized(exchange, "登录状态已失效，请重新登录");
+                        }
+                        Object userId = claims.get("userId");
+                        // 先移除客户端可能伪造的 X-User-* 头，再由网关写入可信值
+                        ServerHttpRequest mutated = request.mutate()
+                                .headers(h -> {
+                                    h.remove(HEADER_USER_ID);
+                                    h.remove(HEADER_USERNAME);
+                                })
+                                .header(HEADER_USER_ID, userId == null ? "" : String.valueOf(userId))
+                                .header(HEADER_USERNAME, username == null ? "" : username)
+                                .build();
+                        return chain.filter(exchange.mutate().request(mutated).build());
+                    });
         });
     }
 

@@ -4,13 +4,14 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cloud.common.exception.BusinessException;
 import com.cloud.common.result.Result;
 import com.cloud.common.result.ResultCode;
-import com.cloud.file.dto.request.BatchDeleteRequest;
-import com.cloud.file.dto.response.BatchDeleteResult;
-import com.cloud.file.dto.response.FileResponse;
+import com.cloud.file.api.dto.BatchDeleteRequest;
+import com.cloud.file.api.dto.BatchDeleteResult;
+import com.cloud.file.api.dto.FileResponse;
 import com.cloud.file.service.FileService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -18,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.InputStream;
 import java.util.List;
 
 /**
@@ -60,49 +62,38 @@ public class FileController {
     }
 
     /**
-     * 文件下载（返回文件流，用于下载）
+     * 文件下载（流式返回，文件内容不读入内存）
      */
     @GetMapping("/download")
 //    @PreAuthorize("hasAuthority('file:download')")
     public ResponseEntity<Resource> download(@RequestParam("id") Long id) {
-        try {
-            FileResponse fileInfo = fileService.getFileById(id);
-            byte[] fileBytes = fileService.downloadFile(fileInfo.getId());
-            ByteArrayResource resource = new ByteArrayResource(fileBytes);
-            return ResponseEntity.ok()
-                    .header(HttpHeaders.CONTENT_DISPOSITION,
-                            "attachment; filename=\"" + fileInfo.getOriginalFileName() + "\"")
-                    .contentType(MediaType.parseMediaType(fileInfo.getContentType()))
-                    .contentLength(fileBytes.length)
-                    .body(resource);
-        } catch (Exception e) {
-            log.error("文件下载失败: id={}, error={}", id, e.getMessage(), e);
-            throw new BusinessException(ResultCode.FILE_DOWNLOAD_FAILED, "文件下载失败");
-        }
+        FileResponse fileInfo = fileService.getFileById(id);
+        InputStream inputStream = fileService.downloadFile(fileInfo.getId());
+        // InputStreamResource 流式写出，Spring MVC 边读边写到响应，响应完成后自动关闭流
+        InputStreamResource resource = new InputStreamResource(inputStream);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        "attachment; filename=\"" + fileInfo.getOriginalFileName() + "\"")
+                .contentType(MediaType.parseMediaType(fileInfo.getContentType()))
+                .contentLength(fileInfo.getFileSize() != null ? fileInfo.getFileSize() : -1)
+                .body(resource);
     }
 
     /**
-     * 按 id 预览文件（支持直接通过URL访问图片、PDF等）
+     * 按 id 预览文件（流式返回，支持直接通过 URL 访问图片、PDF 等）
      */
     @GetMapping("/view")
 //    @PreAuthorize("hasAuthority('file:preview')")
     public ResponseEntity<Resource> viewById(@RequestParam("id") Long id) {
-        try {
-            FileResponse fileInfo = fileService.getFileById(id);
-            byte[] fileBytes = fileService.downloadFile(fileInfo.getId());
-
-            ByteArrayResource resource = new ByteArrayResource(fileBytes);
-
-            return ResponseEntity.ok()
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "inline")
-                    .contentType(MediaType.parseMediaType(fileInfo.getContentType()))
-                    .contentLength(fileBytes.length)
-                    .cacheControl(org.springframework.http.CacheControl.maxAge(30, java.util.concurrent.TimeUnit.DAYS))
-                    .body(resource);
-        } catch (Exception e) {
-            log.error("文件预览失败: id={}, error={}", id, e.getMessage(), e);
-            throw new BusinessException(ResultCode.FILE_NOT_FOUND, "文件预览失败");
-        }
+        FileResponse fileInfo = fileService.getFileById(id);
+        InputStream inputStream = fileService.downloadFile(fileInfo.getId());
+        InputStreamResource resource = new InputStreamResource(inputStream);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "inline")
+                .contentType(MediaType.parseMediaType(fileInfo.getContentType()))
+                .contentLength(fileInfo.getFileSize() != null ? fileInfo.getFileSize() : -1)
+                .cacheControl(org.springframework.http.CacheControl.maxAge(30, java.util.concurrent.TimeUnit.DAYS))
+                .body(resource);
     }
 
     /**
@@ -138,7 +129,7 @@ public class FileController {
      */
     @DeleteMapping("/batch")
 //    @PreAuthorize("hasAuthority('file:delete')")
-    public Result<BatchDeleteResult> batchDelete(@RequestBody BatchDeleteRequest request) {
+    public Result<BatchDeleteResult> batchDelete(@Valid @RequestBody BatchDeleteRequest request) {
         int successCount = fileService.batchDeleteFiles(request.getFileIds());
         BatchDeleteResult result = new BatchDeleteResult();
         result.setTotalCount(request.getFileIds().size());

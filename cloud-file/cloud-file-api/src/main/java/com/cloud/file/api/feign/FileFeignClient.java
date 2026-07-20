@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
  * 文件服务 Feign 客户端接口
  * 用于其他服务通过 Feign 调用文件服务
  */
-@FeignClient(contextId = "fileFeignClient", name = "cloud-file-service",configuration = FeignConfig.class)
+@FeignClient(contextId = "fileFeignClient", name = "cloud-file",configuration = FeignConfig.class)
 public interface FileFeignClient {
 
     /**

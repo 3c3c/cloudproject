@@ -1,6 +1,6 @@
 package com.cloud.file.converter;
 
-import com.cloud.file.dto.response.FileResponse;
+import com.cloud.file.api.dto.FileResponse;
 import com.cloud.file.entity.FileInfo;
 import org.mapstruct.Mapper;
 

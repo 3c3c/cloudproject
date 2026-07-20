@@ -25,7 +25,7 @@ import java.util.Map;
 /**
  * Kafka 配置（生产者 + 消费者）。
  *
- * <p>仅在 cloud-message-service 中生效。message-api 已不再包含任何 Kafka bean，
+ * <p>仅在 cloud-message 服务中生效。message-api 已不再包含任何 Kafka bean，
  * 因此其它服务（auth/admin）依赖 message-api 时不会被动创建 KafkaTemplate、连接 broker。</p>
  *
  * <ul>

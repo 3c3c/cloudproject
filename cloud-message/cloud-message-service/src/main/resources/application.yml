@@ -1,6 +1,6 @@
 spring:
   application:
-    name: cloud-message-service
+    name: cloud-message
   cloud:
     nacos:
       server-addr: ${NACOS_ADDR:127.0.0.1:8848}

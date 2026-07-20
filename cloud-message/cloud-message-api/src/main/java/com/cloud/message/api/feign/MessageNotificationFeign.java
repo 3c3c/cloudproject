@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
  * @author Cloud Team
  * @since 2025-01-15
  */
-@FeignClient(contextId = "messageNotificationFeign", name = "cloud-message-service")
+@FeignClient(contextId = "messageNotificationFeign", name = "cloud-message")
 public interface MessageNotificationFeign {
 
     /**

@@ -8,7 +8,7 @@ import com.cloud.common.result.ResultCode;
 import com.cloud.common.utils.IdUtils;
 import com.cloud.file.config.FileStorageProperties;
 import com.cloud.file.converter.FileConverter;
-import com.cloud.file.dto.response.FileResponse;
+import com.cloud.file.api.dto.FileResponse;
 import com.cloud.file.entity.FileInfo;
 import com.cloud.file.mapper.FileInfoMapper;
 import com.cloud.file.service.FileService;
@@ -131,10 +131,11 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public byte[] downloadFile(Long id) {
+    public InputStream downloadFile(Long id) {
         FileResponse fileResponse = getFileById(id);
-        try (InputStream inputStream = fileStorageService.download(fileResponse.getFileKey())) {
-            return inputStream.readAllBytes();
+        try {
+            // 直接返回底层存储的输入流，不读入内存。流的关闭由调用方（InputStreamResource）负责。
+            return fileStorageService.download(fileResponse.getFileKey());
         } catch (Exception e) {
             throw new BusinessException(ResultCode.FILE_DOWNLOAD_FAILED);
         }
@@ -223,9 +224,15 @@ public class FileServiceImpl implements FileService {
         }
 
         // 文件扩展名校验
+        // 注意：必须用 getAllowedExtensionList() 按列表精确匹配，
+        // 不能对 getAllowedExtensions() 整串做 .contains() ——那会变成子串匹配，
+        // 导致扩展名 "g"/"p"/"ar" 等（恰好是 jpg/png/rar 的子串）被误判为合法。
         String extension = FileKeyGenerator.getExtension(file.getOriginalFilename());
-        if (storageProperties.getAllowedExtensions() != null &&
-                !storageProperties.getAllowedExtensions().contains(extension)) {
+        List<String> allowed = storageProperties.getAllowedExtensionList().stream()
+                .map(String::trim)
+                .map(String::toLowerCase)
+                .collect(java.util.stream.Collectors.toList());
+        if (!allowed.isEmpty() && !allowed.contains(extension)) {
             throw new BusinessException(ResultCode.FILE_TYPE_NOT_ALLOWED);
         }
     }

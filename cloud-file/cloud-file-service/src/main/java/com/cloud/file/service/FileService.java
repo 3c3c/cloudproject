@@ -1,9 +1,10 @@
 package com.cloud.file.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.cloud.file.dto.response.FileResponse;
+import com.cloud.file.api.dto.FileResponse;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.InputStream;
 import java.util.List;
 
 /**
@@ -32,9 +33,14 @@ public interface FileService {
     FileResponse getFileByKey(String fileKey);
 
     /**
-     * 下载文件
+     * 下载文件（流式）。
+     * <p>返回底层存储的 {@link InputStream}，不将整个文件读入内存，适合大文件下载/预览。
+     * <b>调用方负责消费并关闭该流</b>（Spring 的 InputStreamResource 会在响应写出后自动关闭）。</p>
+     *
+     * @param id 文件 ID
+     * @return 文件输入流
      */
-    byte[] downloadFile(Long id);
+    InputStream downloadFile(Long id);
 
     /**
      * 获取文件预览 URL
