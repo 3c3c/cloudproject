@@ -15,7 +15,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 /**
- * 订单服务安全配置：与产品服务一致，解析网关透传的 X-User-* 头构建认证上下文。
+ * 后台管理服务（cloud-admin）安全配置：解析网关透传的 X-User-* 头构建认证上下文。
  */
 @Configuration
 @EnableWebSecurity

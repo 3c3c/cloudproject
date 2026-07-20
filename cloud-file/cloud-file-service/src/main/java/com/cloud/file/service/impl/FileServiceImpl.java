@@ -5,7 +5,6 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cloud.common.exception.BusinessException;
 import com.cloud.common.result.ResultCode;
-import com.cloud.common.utils.IdUtils;
 import com.cloud.file.config.FileStorageProperties;
 import com.cloud.file.converter.FileConverter;
 import com.cloud.file.api.dto.FileResponse;
@@ -18,6 +17,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.InputStream;
@@ -62,27 +63,17 @@ public class FileServiceImpl implements FileService {
             return fileConverter.toResponse(existingFile);
         }
 
-        // 4. 生成 fileKey
-        String fileKey = FileKeyGenerator.generateKey(
+        // 4. 生成 fileKey（事务内确定，供 afterCommit 上传使用）
+        final String fileKey = FileKeyGenerator.generateKey(
                 businessType != null ? businessType : "general",
                 file.getOriginalFilename()
         );
 
-        // 5. 上传到存储服务
-        try (InputStream inputStream = file.getInputStream()) {
-            fileStorageService.upload(
-                    inputStream,
-                    fileKey,
-                    file.getContentType(),
-                    file.getSize()
-            );
-        } catch (Exception e) {
-            throw new BusinessException(ResultCode.FILE_UPLOAD_FAILED, "上传失败");
-        }
-
-        // 6. 保存文件信息到数据库
+        // 5. 事务内：先落库（存储尚未上传）。
+        // id 由 MyBatis-Plus 的 IdWorker 生成（与实体 @TableId(ASSIGN_ID) 底层同一套雪花算法），
+        // 多实例下基于 machineId/PID 自动分配 workerId，避免硬编码导致的 ID 冲突。
         FileInfo fileInfo = new FileInfo();
-        long id = IdUtils.nextId();
+        long id = com.baomidou.mybatisplus.core.toolkit.IdWorker.getId();
         fileInfo.setId(id);
         fileInfo.setFileKey(fileKey);
         fileInfo.setOriginalFileName(file.getOriginalFilename());
@@ -94,9 +85,35 @@ public class FileServiceImpl implements FileService {
         fileInfo.setBusinessType(businessType);
         fileInfo.setBusinessId(businessId);
         fileInfo.setFileUrl(buildFileUrl(id));
-
         fileInfoMapper.insert(fileInfo);
-        log.info("File uploaded successfully: id={}, key={}", fileInfo.getId(), fileKey);
+
+        // 捕获上传所需的不可变快照（MultipartFile 在事务提交后仍需可读，故在事务内取出流复用需谨慎：
+        // 这里把上传动作整体放到 afterCommit，直接用 file 对象——它在请求作用域内有效）
+        final MultipartFile fileToUpload = file;
+        final Long fileId = id;
+
+        // 6. 事务提交后再上传存储——避免网络 IO 长占 DB 连接，并保证“DB 记录已持久化”才真正写存储。
+        //    上传失败则补偿：删除刚才插入的 DB 记录（物理删，因它对应的文件并未成功写入存储），保持一致。
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCommit() {
+                try (InputStream inputStream = fileToUpload.getInputStream()) {
+                    fileStorageService.upload(
+                            inputStream,
+                            fileKey,
+                            fileToUpload.getContentType(),
+                            fileToUpload.getSize()
+                    );
+                    log.info("File uploaded to storage successfully: id={}, key={}", fileId, fileKey);
+                } catch (Exception e) {
+                    log.error("Storage upload failed after DB commit, compensating by deleting record: id={}", fileId, e);
+                    // 补偿：物理删除 DB 记录（此记录对应的文件并未成功写入存储）
+                    fileInfoMapper.deleteById(fileId);
+                }
+            }
+        });
+
+        log.info("File record saved, pending storage upload: id={}, key={}", fileInfo.getId(), fileKey);
         return fileConverter.toResponse(fileInfo);
     }
 
@@ -155,15 +172,33 @@ public class FileServiceImpl implements FileService {
             return false;
         }
 
-        // 1. 删除存储中的文件
-        boolean deleted = fileStorageService.delete(fileInfo.getFileKey());
-        if (!deleted) {
-            log.warn("Failed to delete file from storage: {}", fileInfo.getFileKey());
-        }
-
-        // 2. 逻辑删除数据库记录
+        // 1. 事务内：先逻辑删除 DB 记录。
+        //    删除存储是物理删除、不可逆，故必须保证 DB 已标记删除后才删存储，
+        //    避免“存储已删但 DB 回滚”导致文件永久丢失。存储删除失败不影响 DB 软删结果，
+        //    残留的孤儿存储对象可由后台定期清理任务回收。
         fileInfo.setDeleted(System.currentTimeMillis());
         fileInfoMapper.updateById(fileInfo);
+
+        final String fileKey = fileInfo.getFileKey();
+        final Long fileId = id;
+
+        // 2. 事务提交后再删除存储对象（网络 IO 不占用 DB 事务）。
+        //    失败仅记日志——DB 已软删，文件对用户不可见；孤儿对象留待后台清理，绝不回滚 DB。
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCommit() {
+                try {
+                    boolean deleted = fileStorageService.delete(fileKey);
+                    if (!deleted) {
+                        log.warn("Storage object not deleted (will remain as orphan): fileKey={}", fileKey);
+                    } else {
+                        log.info("Storage object deleted: id={}, key={}", fileId, fileKey);
+                    }
+                } catch (Exception e) {
+                    log.error("Storage deletion failed, DB already soft-deleted (orphan object left): id={}", fileId, e);
+                }
+            }
+        });
 
         return true;
     }
